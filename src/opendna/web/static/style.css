@@ -1,0 +1,46 @@
+:root {
+  --bg: #0a0a0a; --card: #1a1a1a; --text: #f0f0f0; --dim: #a0a0a0;
+  --border: #333; --accent: #ffd700; --danger: #ff4d4d;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; margin: 0; padding: 40px 20px; }
+.shell { max-width: 880px; margin: 0 auto; }
+header { border-bottom: 2px solid var(--accent); padding-bottom: 16px; margin-bottom: 32px; }
+h1 { margin: 0; color: var(--accent); font-size: 2.5rem; letter-spacing: -1px; text-transform: uppercase; }
+.tag { color: var(--dim); margin: 4px 0 0; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.card h2 { margin: 0 0 12px; font-size: 1.1rem; color: var(--accent); }
+label { display: block; margin-bottom: 10px; font-size: 0.9rem; color: var(--dim); }
+input, select { display: block; width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.95rem; margin-top: 4px; font-family: inherit; }
+input:focus, select:focus { outline: none; border-color: var(--accent); }
+#panels { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#panels label { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; margin: 0; cursor: pointer; }
+#panels input[type="checkbox"] { width: auto; margin: 0; }
+.primary { background: var(--accent); color: var(--bg); border: none; border-radius: 10px; padding: 14px 24px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; }
+.primary:hover { filter: brightness(1.1); }
+.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.secondary { background: transparent; color: var(--dim); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; cursor: pointer; }
+.secondary:hover { border-color: var(--accent); color: var(--accent); }
+.storage-note { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.storage-note .remember { display: flex; align-items: center; gap: 8px; margin: 0; flex: 1; min-width: 280px; color: var(--dim); font-size: 0.85rem; }
+.storage-note .remember input[type="checkbox"] { width: auto; margin: 0; }
+.storage-note code { background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.78rem; color: var(--accent); }
+.status { margin-top: 16px; color: var(--dim); font-size: 0.9rem; }
+.status.error { color: var(--danger); }
+.progress { margin-top: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.progress.hidden { display: none; }
+.progress-bar { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #ffaa00); transition: width 0.35s ease; }
+.progress-current { margin-top: 12px; color: var(--text); font-weight: 600; font-size: 0.95rem; }
+.progress-current .pct { color: var(--accent); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.progress-log { list-style: none; padding: 0; margin: 10px 0 0; font-size: 0.82rem; color: var(--dim); max-height: 140px; overflow-y: auto; border-top: 1px dashed var(--border); padding-top: 8px; }
+.progress-log li { padding: 2px 0; }
+.progress-log li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
+.progress-log li.error::before { content: "✗ "; color: var(--danger); }
+.progress-log li.error { color: var(--danger); }
+.report { margin-top: 32px; }
+.report.hidden { display: none; }
+.report-actions { display: flex; gap: 8px; margin-bottom: 12px; }
+.report-actions button { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+.report-actions button:hover { border-color: var(--accent); color: var(--accent); }
+iframe { width: 100%; height: 1100px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }

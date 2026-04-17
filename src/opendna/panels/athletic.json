@@ -1,0 +1,62 @@
+{
+  "id": "athletic",
+  "name": "Athletic Performance & Recovery",
+  "description": "Muscle fiber composition, VO2 max response, injury susceptibility, recovery speed.",
+  "snps": [
+    {
+      "rsid": "rs1815739",
+      "gene": "ACTN3",
+      "variant_name": "R577X",
+      "description": "Alpha-actinin-3 in fast-twitch muscle. XX (TT) genotype lacks functional protein — common in endurance athletes, rare in elite sprinters.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "RR — sprint/power-oriented fiber profile."},
+        "CT": {"tier": "normal", "note": "RX — mixed profile."},
+        "TT": {"tier": "normal", "note": "XX — endurance-oriented; functional alpha-actinin-3 absent from fast-twitch fibers."}
+      }
+    },
+    {
+      "rsid": "rs4253778",
+      "gene": "PPARA",
+      "variant_name": "Power vs endurance",
+      "description": "Fatty-acid oxidation regulator; G allele associated with power phenotype, C with endurance.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Endurance-skewed."},
+        "CG": {"tier": "normal", "note": "Mixed."},
+        "GG": {"tier": "normal", "note": "Power-skewed."}
+      }
+    },
+    {
+      "rsid": "rs8192678",
+      "gene": "PPARGC1A",
+      "variant_name": "Mitochondrial biogenesis",
+      "description": "Master regulator of mitochondrial biogenesis; associated with VO2 max trainability.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "High trainability of aerobic capacity."},
+        "AG": {"tier": "normal", "note": "Intermediate."},
+        "AA": {"tier": "warning", "note": "Reduced aerobic trainability — higher volume may be needed to reach same gains."}
+      }
+    },
+    {
+      "rsid": "rs12722",
+      "gene": "COL5A1",
+      "variant_name": "Tendon flexibility",
+      "description": "Type V collagen; variants influence tendon/ligament stiffness and soft-tissue injury risk.",
+      "interpretations": {
+        "CC": {"tier": "warning", "note": "Stiffer tendons — higher rupture risk at extremes."},
+        "CT": {"tier": "normal", "note": "Mixed."},
+        "TT": {"tier": "normal", "note": "More compliant tendons."}
+      }
+    },
+    {
+      "rsid": "rs1800795",
+      "gene": "IL6",
+      "variant_name": "-174 G/C",
+      "description": "Regulates IL-6 expression; C allele associated with lower inflammation and faster recovery.",
+      "interpretations": {
+        "GG": {"tier": "warning", "note": "Higher inflammatory response — longer recovery windows may help."},
+        "CG": {"tier": "normal", "note": "Intermediate."},
+        "CC": {"tier": "normal", "note": "Lower inflammatory response — faster recovery profile."}
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "hfe",
+  "name": "Iron Metabolism (HFE)",
+  "description": "Hereditary hemochromatosis variants — excess iron absorption.",
+  "snps": [
+    {
+      "rsid": "rs1800562",
+      "gene": "HFE",
+      "variant_name": "C282Y",
+      "description": "Primary clinical variant; homozygotes have high penetrance for iron overload.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Non-carrier."},
+        "AG": {"tier": "warning", "note": "Heterozygous — mild iron-loading tendency; monitor ferritin."},
+        "AA": {"tier": "risk", "note": "Homozygous — high risk of clinical hemochromatosis; requires monitoring and possible therapeutic phlebotomy."}
+      }
+    },
+    {
+      "rsid": "rs1799945",
+      "gene": "HFE",
+      "variant_name": "H63D",
+      "description": "Secondary variant; lower penetrance than C282Y but compound heterozygotes (C282Y/H63D) have meaningful risk.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Non-carrier."},
+        "CG": {"tier": "warning", "note": "Heterozygous — mild iron-loading tendency."},
+        "GG": {"tier": "warning", "note": "Homozygous — modest iron-loading risk; monitor ferritin."}
+      }
+    },
+    {
+      "rsid": "rs1800730",
+      "gene": "HFE",
+      "variant_name": "S65C",
+      "description": "Minor variant; compound heterozygosity with C282Y may matter.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Non-carrier."},
+        "AT": {"tier": "normal", "note": "Heterozygous — clinically significant only with C282Y on other allele."},
+        "TT": {"tier": "warning", "note": "Homozygous — rare; modest iron-loading tendency."}
+      }
+    }
+  ]
+}

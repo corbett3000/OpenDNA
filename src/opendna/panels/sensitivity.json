@@ -1,0 +1,40 @@
+{
+  "id": "sensitivity",
+  "name": "Stimulant & Adenosine Sensitivity",
+  "description": "Variants controlling how caffeine and adenosine interact with the brain.",
+  "snps": [
+    {
+      "rsid": "rs5751876",
+      "gene": "ADORA2A",
+      "variant_name": "Adenosine A2A receptor",
+      "description": "T allele associated with higher caffeine-induced anxiety.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Standard response."},
+        "CT": {"tier": "warning", "note": "Moderate anxiety sensitivity to caffeine."},
+        "TT": {"tier": "warning", "note": "High anxiety sensitivity to caffeine — moderate intake."}
+      }
+    },
+    {
+      "rsid": "rs2069514",
+      "gene": "CYP1A2",
+      "variant_name": "-163 promoter",
+      "description": "Companion marker to rs762551; further modulates caffeine metabolism rate.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Normal induction."},
+        "AG": {"tier": "normal", "note": "Intermediate."},
+        "GG": {"tier": "normal", "note": "Higher inducibility."}
+      }
+    },
+    {
+      "rsid": "rs4680",
+      "gene": "COMT",
+      "variant_name": "Val158Met (stimulant re-check)",
+      "description": "Cross-referenced from methylation panel; modulates subjective stimulant response via prefrontal dopamine.",
+      "interpretations": {
+        "GG": {"tier": "warning", "note": "Warrior — dopamine clears fast; stimulants may feel less intense."},
+        "AG": {"tier": "normal", "note": "Balanced."},
+        "AA": {"tier": "warning", "note": "Worrier — stimulants may feel stronger, potentially more anxiogenic."}
+      }
+    }
+  ]
+}

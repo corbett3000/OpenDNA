@@ -1,0 +1,95 @@
+{
+  "id": "methylation",
+  "name": "Methylation & Detox",
+  "description": "Variants in the folate / methionine cycle and related detox pathways.",
+  "snps": [
+    {
+      "rsid": "rs1801133",
+      "gene": "MTHFR",
+      "variant_name": "C677T",
+      "description": "Central methylation enzyme; reduced function lowers folate-to-methylfolate conversion.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Standard MTHFR activity."},
+        "CT": {"tier": "warning", "note": "~30% reduced enzyme activity; monitor homocysteine."},
+        "TT": {"tier": "risk", "note": "~60-70% reduced activity; consider methylfolate supplementation under clinician guidance."}
+      }
+    },
+    {
+      "rsid": "rs1801131",
+      "gene": "MTHFR",
+      "variant_name": "A1298C",
+      "description": "Second MTHFR variant; compound heterozygosity with C677T compounds impairment.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Standard activity."},
+        "AC": {"tier": "warning", "note": "Mild reduction; clinically meaningful only when combined with C677T variant."},
+        "CC": {"tier": "warning", "note": "Homozygous; modest reduction in activity."}
+      }
+    },
+    {
+      "rsid": "rs4680",
+      "gene": "COMT",
+      "variant_name": "Val158Met",
+      "description": "Controls dopamine clearance in prefrontal cortex. Val/Val = fast clearance (Warrior); Met/Met = slow (Worrier).",
+      "interpretations": {
+        "GG": {"tier": "warning", "note": "Warrior phenotype — fast dopamine clearance; often higher stress resilience, lower baseline dopamine."},
+        "AG": {"tier": "normal", "note": "Balanced clearance."},
+        "AA": {"tier": "warning", "note": "Worrier phenotype — slow clearance; higher baseline dopamine, potentially higher anxiety under stress."}
+      }
+    },
+    {
+      "rsid": "rs1805087",
+      "gene": "MTR",
+      "variant_name": "A2756G",
+      "description": "B12-dependent methionine synthase; pairs with MTRR in the methylation cycle.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Standard activity."},
+        "AG": {"tier": "warning", "note": "Slightly reduced activity; monitor B12 status."},
+        "GG": {"tier": "warning", "note": "Reduced activity; B12 sufficiency is important."}
+      }
+    },
+    {
+      "rsid": "rs1801394",
+      "gene": "MTRR",
+      "variant_name": "A66G",
+      "description": "Recycles oxidized B12 to active form for the MTR enzyme.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Standard recycling."},
+        "AG": {"tier": "warning", "note": "Moderate reduction; paired MTR/MTRR variants amplify impact."},
+        "GG": {"tier": "warning", "note": "Reduced recycling of B12."}
+      }
+    },
+    {
+      "rsid": "rs602662",
+      "gene": "FUT2",
+      "variant_name": "Secretor",
+      "description": "Secretor status — controls whether B12-binding glycoproteins are secreted into gut. Non-secretors have higher serum B12 but may absorb less.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Secretor — standard B12 absorption."},
+        "AG": {"tier": "normal", "note": "Heterozygous secretor."},
+        "GG": {"tier": "warning", "note": "Non-secretor — may need higher dietary B12."}
+      }
+    },
+    {
+      "rsid": "rs234706",
+      "gene": "CBS",
+      "variant_name": "C699T",
+      "description": "Cystathionine beta-synthase; the drain of homocysteine into the transsulfuration pathway.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Standard activity."},
+        "CT": {"tier": "warning", "note": "Upregulated variant — may deplete methyl groups faster."},
+        "TT": {"tier": "warning", "note": "Homozygous upregulation."}
+      }
+    },
+    {
+      "rsid": "rs2228570",
+      "gene": "VDR",
+      "variant_name": "TaqI",
+      "description": "Vitamin D receptor affinity; influences downstream methylation cofactor availability.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Higher receptor sensitivity."},
+        "AG": {"tier": "normal", "note": "Intermediate sensitivity."},
+        "AA": {"tier": "warning", "note": "Lower receptor sensitivity — may benefit from higher vitamin D intake."}
+      }
+    }
+  ]
+}

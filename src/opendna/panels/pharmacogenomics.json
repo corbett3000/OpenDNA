@@ -1,0 +1,95 @@
+{
+  "id": "pharmacogenomics",
+  "name": "Pharmacogenomics (PGx)",
+  "description": "Drug-metabolism variants that affect dosing and response. Cross-referenced with PharmGKB/CPIC.",
+  "snps": [
+    {
+      "rsid": "rs4244285",
+      "gene": "CYP2C19",
+      "variant_name": "*2 loss-of-function",
+      "description": "Affects clopidogrel, PPIs, citalopram, escitalopram, some SSRIs.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Normal metabolizer at this site."},
+        "AG": {"tier": "warning", "note": "Intermediate metabolizer — reduced function."},
+        "AA": {"tier": "risk", "note": "Poor metabolizer — clopidogrel may be ineffective; SSRIs may accumulate."}
+      }
+    },
+    {
+      "rsid": "rs12248560",
+      "gene": "CYP2C19",
+      "variant_name": "*17 gain-of-function",
+      "description": "Ultra-rapid metabolizer variant.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Normal."},
+        "CT": {"tier": "warning", "note": "Rapid metabolizer — drugs cleared faster than expected."},
+        "TT": {"tier": "warning", "note": "Ultra-rapid metabolizer — standard doses may be subtherapeutic."}
+      }
+    },
+    {
+      "rsid": "rs1799853",
+      "gene": "CYP2C9",
+      "variant_name": "*2 reduced function",
+      "description": "Affects warfarin, NSAIDs (ibuprofen, celecoxib), phenytoin.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Normal metabolizer."},
+        "CT": {"tier": "warning", "note": "Intermediate — bleeding risk with warfarin, consider dose reduction."},
+        "TT": {"tier": "risk", "note": "Poor metabolizer — significant bleeding risk with warfarin."}
+      }
+    },
+    {
+      "rsid": "rs1057910",
+      "gene": "CYP2C9",
+      "variant_name": "*3 reduced function",
+      "description": "More severe variant; affects same drug set as *2.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Normal."},
+        "AC": {"tier": "risk", "note": "Intermediate — significant dose reduction often needed."},
+        "CC": {"tier": "risk", "note": "Poor metabolizer — specialist dosing required."}
+      }
+    },
+    {
+      "rsid": "rs9923231",
+      "gene": "VKORC1",
+      "variant_name": "Warfarin sensitivity",
+      "description": "Warfarin's target enzyme; variants increase sensitivity.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Standard sensitivity."},
+        "CT": {"tier": "warning", "note": "Increased sensitivity — lower starting dose."},
+        "TT": {"tier": "risk", "note": "High sensitivity — lowest starting dose band."}
+      }
+    },
+    {
+      "rsid": "rs4149056",
+      "gene": "SLCO1B1",
+      "variant_name": "*5 statin myopathy risk",
+      "description": "Controls statin uptake into hepatocytes; risk variant raises simvastatin-induced myopathy risk.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "Normal."},
+        "CT": {"tier": "warning", "note": "Increased myopathy risk — prefer atorvastatin/rosuvastatin."},
+        "CC": {"tier": "risk", "note": "Highest myopathy risk — avoid simvastatin 80 mg."}
+      }
+    },
+    {
+      "rsid": "rs1142345",
+      "gene": "TPMT",
+      "variant_name": "*3C",
+      "description": "Thiopurine metabolism — azathioprine, 6-MP, 6-TG. Poor metabolizers face severe bone marrow toxicity at standard doses.",
+      "interpretations": {
+        "TT": {"tier": "risk", "note": "Poor metabolizer — standard thiopurine doses can cause fatal myelosuppression. Requires dose reduction or alternative therapy."},
+        "CT": {"tier": "warning", "note": "Intermediate metabolizer — 30-70% dose reduction typical."},
+        "CC": {"tier": "normal", "note": "Normal metabolizer."}
+      }
+    },
+    {
+      "rsid": "rs776746",
+      "gene": "CYP3A5",
+      "variant_name": "*3",
+      "description": "Tacrolimus, some statins. Expressors need higher doses than non-expressors.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "Non-expressor (common in European ancestry) — standard dosing."},
+        "CT": {"tier": "warning", "note": "Intermediate expresser — dose adjustment may be needed."},
+        "CC": {"tier": "warning", "note": "Expresser — higher tacrolimus doses needed."}
+      }
+    }
+  ]
+}

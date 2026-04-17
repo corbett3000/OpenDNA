@@ -1,0 +1,121 @@
+{
+  "rs1142345": {
+    "gene": "TPMT",
+    "recommendations": [
+      {
+        "drug": "azathioprine",
+        "diplotype": "*1/*3C or *3C/*3C",
+        "recommendation": "Consider alternative non-thiopurine therapy; if used, reduce dose 10-fold and monitor for severe myelosuppression.",
+        "evidence_level": "1A",
+        "source": "CPIC 2018"
+      },
+      {
+        "drug": "mercaptopurine",
+        "diplotype": "*1/*3C or *3C/*3C",
+        "recommendation": "Start at 30-80% of normal dose (heterozygote) or 10% of normal dose (homozygote).",
+        "evidence_level": "1A",
+        "source": "CPIC 2018"
+      },
+      {
+        "drug": "thioguanine",
+        "diplotype": "*1/*3C or *3C/*3C",
+        "recommendation": "Start at 50-80% of normal dose (heterozygote) or consider alternative (homozygote).",
+        "evidence_level": "1A",
+        "source": "CPIC 2018"
+      }
+    ]
+  },
+  "rs4244285": {
+    "gene": "CYP2C19",
+    "recommendations": [
+      {
+        "drug": "clopidogrel",
+        "diplotype": "*2 carrier (intermediate/poor metabolizer)",
+        "recommendation": "Consider alternative antiplatelet agent (prasugrel or ticagrelor) if no contraindication.",
+        "evidence_level": "1A",
+        "source": "CPIC 2022"
+      },
+      {
+        "drug": "citalopram",
+        "diplotype": "poor metabolizer",
+        "recommendation": "Consider 50% dose reduction or alternative SSRI.",
+        "evidence_level": "1A",
+        "source": "CPIC 2015"
+      }
+    ]
+  },
+  "rs12248560": {
+    "gene": "CYP2C19",
+    "recommendations": [
+      {
+        "drug": "clopidogrel",
+        "diplotype": "*17 carrier (rapid/ultrarapid metabolizer)",
+        "recommendation": "Standard dosing; monitor for bleeding with concurrent PPI use.",
+        "evidence_level": "1A",
+        "source": "CPIC 2022"
+      },
+      {
+        "drug": "voriconazole",
+        "diplotype": "ultrarapid metabolizer",
+        "recommendation": "Subtherapeutic levels likely — consider alternative antifungal.",
+        "evidence_level": "1A",
+        "source": "CPIC 2017"
+      }
+    ]
+  },
+  "rs1799853": {
+    "gene": "CYP2C9",
+    "recommendations": [
+      {
+        "drug": "warfarin",
+        "diplotype": "*2 carrier",
+        "recommendation": "Use pharmacogenomic-guided dosing algorithm (e.g. warfarindosing.org).",
+        "evidence_level": "1A",
+        "source": "CPIC 2017"
+      },
+      {
+        "drug": "celecoxib",
+        "diplotype": "*2 carrier",
+        "recommendation": "Use lowest effective dose; consider 25-50% reduction.",
+        "evidence_level": "2A",
+        "source": "CPIC 2020"
+      }
+    ]
+  },
+  "rs1057910": {
+    "gene": "CYP2C9",
+    "recommendations": [
+      {
+        "drug": "warfarin",
+        "diplotype": "*3 carrier",
+        "recommendation": "Use PGx-guided dosing; *3/*3 requires substantial dose reduction.",
+        "evidence_level": "1A",
+        "source": "CPIC 2017"
+      }
+    ]
+  },
+  "rs9923231": {
+    "gene": "VKORC1",
+    "recommendations": [
+      {
+        "drug": "warfarin",
+        "diplotype": "-1639 A carrier",
+        "recommendation": "Lower initial warfarin dose (pair with CYP2C9 genotype for full algorithm).",
+        "evidence_level": "1A",
+        "source": "CPIC 2017"
+      }
+    ]
+  },
+  "rs4149056": {
+    "gene": "SLCO1B1",
+    "recommendations": [
+      {
+        "drug": "simvastatin",
+        "diplotype": "*5 carrier",
+        "recommendation": "Avoid simvastatin 80 mg; consider atorvastatin or rosuvastatin.",
+        "evidence_level": "1A",
+        "source": "CPIC 2022"
+      }
+    ]
+  }
+}

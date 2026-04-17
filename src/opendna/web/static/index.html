@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenDNA</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>OpenDNA</h1>
+      <p class="tag">Local precision-medicine synthesis · your DNA stays on your machine</p>
+    </header>
+
+    <section class="card">
+      <h2>1. Point us at your raw DNA file</h2>
+      <label>Absolute path to your 23andMe / AncestryDNA raw TSV:
+        <input id="file-path" type="text" placeholder="/Users/you/Downloads/genome.txt" spellcheck="false">
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>2. Choose panels</h2>
+      <div id="panels"></div>
+    </section>
+
+    <section class="card">
+      <h2>3. (Optional) AI synthesis</h2>
+      <label>Provider:
+        <select id="llm-provider">
+          <option value="">None (rule-based only)</option>
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI (GPT)</option>
+        </select>
+      </label>
+      <label>Model: <input id="llm-model" type="text" placeholder="claude-sonnet-4-6"></label>
+      <label>API key:
+        <input id="llm-key" type="password" placeholder="sk-...">
+      </label>
+    </section>
+
+    <section class="card storage-note">
+      <label class="remember">
+        <input id="remember" type="checkbox" checked>
+        <span>Remember these values on this browser (stored in <code>localStorage</code>, never sent anywhere).</span>
+      </label>
+      <button id="clear-saved" type="button" class="secondary">Clear saved values</button>
+    </section>
+
+    <button id="run" class="primary">Generate report</button>
+    <div id="status" class="status"></div>
+
+    <section id="progress" class="progress hidden" aria-live="polite">
+      <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+      <div id="progress-current" class="progress-current"></div>
+      <ul id="progress-log" class="progress-log"></ul>
+    </section>
+
+    <section id="report-frame" class="report hidden">
+      <div class="report-actions">
+        <button id="download-html">Download HTML</button>
+        <button id="download-json">Download JSON</button>
+      </div>
+      <iframe id="report-iframe" title="OpenDNA report" sandbox="allow-same-origin"></iframe>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

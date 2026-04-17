@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+dist/
+build/
+.DS_Store
+.env
+.env.*
+*.pc.txt
+*_genome_*.txt
+*_genome_*.zip
+
+# Per-user config that must never be committed — DNA paths + API keys.
+# The current build stores these in browser localStorage (not on disk),
+# but guard against any future on-disk config.
+opendna.config.json
+opendna.local.*
+secrets.json
+**/*.secret.*

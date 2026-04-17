@@ -1,0 +1,62 @@
+{
+  "id": "cardiovascular",
+  "name": "Cardiovascular & Longevity",
+  "description": "Variants associated with coronary artery disease risk and lifespan.",
+  "snps": [
+    {
+      "rsid": "rs429358",
+      "gene": "APOE",
+      "variant_name": "epsilon-4 check (site 1)",
+      "description": "Paired with rs7412 to determine APOE haplotype (e2/e3/e4). e4 raises Alzheimer's and CAD risk.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "Not e4 at this site."},
+        "CT": {"tier": "warning", "note": "Possible single e4 allele — interpret with rs7412."},
+        "CC": {"tier": "risk", "note": "Possible e4/e4 — interpret with rs7412; elevated Alzheimer's + CAD risk."}
+      }
+    },
+    {
+      "rsid": "rs7412",
+      "gene": "APOE",
+      "variant_name": "epsilon-2 check (site 2)",
+      "description": "Paired with rs429358 to determine APOE haplotype.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Not e2 at this site."},
+        "CT": {"tier": "normal", "note": "One e2 allele possible — often protective for lipids."},
+        "TT": {"tier": "warning", "note": "e2/e2 possible — rare, associated with type III hyperlipoproteinemia."}
+      }
+    },
+    {
+      "rsid": "rs10757278",
+      "gene": "9p21",
+      "variant_name": "CAD locus",
+      "description": "Best-characterized CAD-risk locus; risk allele ~25% population-attributable risk.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Non-risk genotype."},
+        "AG": {"tier": "warning", "note": "One risk allele — modestly elevated CAD risk."},
+        "GG": {"tier": "risk", "note": "Two risk alleles — elevated CAD risk; focus on LDL particle size + inflammation."}
+      }
+    },
+    {
+      "rsid": "rs2802292",
+      "gene": "FOXO3",
+      "variant_name": "Longevity variant",
+      "description": "Centenarian gene — G allele associated with longer lifespan across populations.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "Common genotype."},
+        "GT": {"tier": "normal", "note": "Protective longevity allele present."},
+        "GG": {"tier": "normal", "note": "Protective longevity allele homozygous."}
+      }
+    },
+    {
+      "rsid": "rs3798220",
+      "gene": "LPA",
+      "variant_name": "Lipoprotein(a) risk",
+      "description": "Strong predictor of elevated Lp(a); associated with CAD and aortic stenosis.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "Not a risk carrier."},
+        "CT": {"tier": "risk", "note": "Risk allele present — consider measuring Lp(a)."},
+        "CC": {"tier": "risk", "note": "Homozygous risk — strongly associated with elevated Lp(a)."}
+      }
+    }
+  ]
+}

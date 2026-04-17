@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenDNA Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FFD700;
+      --risk: #FF4D4D;
+      --warning: #FFB300;
+      --success: #00E676;
+      --unknown: #666;
+      --bg: #0A0A0A;
+      --card-bg: #1A1A1A;
+      --card-item: rgba(255,255,255,0.03);
+      --text: #F0F0F0;
+      --text-dim: #A0A0A0;
+      --border: #333;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; line-height: 1.6; }
+    .container { max-width: 960px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 32px; gap: 20px; flex-wrap: wrap; }
+    h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: -1px; }
+    .tagline { color: var(--text-dim); margin: 4px 0 0; font-size: 0.95rem; }
+    .meta { text-align: right; color: var(--text-dim); font-size: 0.85rem; }
+    .meta .big { color: var(--text); font-size: 1.05rem; font-weight: 600; margin: 2px 0; }
+
+    .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+    @media (max-width: 560px) { .summary-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+    .stat .num { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+    .stat .lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .stat.risk .num { color: var(--risk); }
+    .stat.warning .num { color: var(--warning); }
+    .stat.normal .num { color: var(--success); }
+    .stat.unknown .num { color: var(--unknown); }
+
+    .critical-alert { background: rgba(255,77,77,0.08); border: 2px solid var(--risk); padding: 20px 24px; border-radius: 12px; margin-bottom: 28px; }
+    .critical-alert h3 { font-family: 'Outfit', sans-serif; margin: 0 0 14px; color: var(--risk); text-transform: uppercase; font-size: 1.05rem; letter-spacing: 1px; }
+    .critical-alert .item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,77,77,0.25); font-size: 0.95rem; }
+    .critical-alert .item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+    .critical-alert strong { color: var(--text); }
+    .critical-alert em { color: var(--text-dim); font-style: italic; }
+
+    .ai-synthesis { background: rgba(255,215,0,0.06); border: 1px solid var(--primary); border-radius: 16px; padding: 28px; margin-bottom: 32px; }
+    .ai-synthesis h2 { font-family: 'Outfit', sans-serif; margin: 0 0 16px; color: var(--primary); font-size: 1.35rem; font-weight: 600; }
+    .ai-synthesis pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.7; font-size: 0.95rem; }
+
+    .section { margin-bottom: 28px; background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .section > h2 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 0 0 20px; padding-bottom: 10px; color: var(--primary); border-bottom: 1px solid var(--border); }
+
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card-item); padding: 16px 18px; border-radius: 12px; border-left: 4px solid var(--border); display: flex; flex-direction: column; }
+    .card.risk { border-left-color: var(--risk); }
+    .card.warning { border-left-color: var(--warning); }
+    .card.normal { border-left-color: var(--success); }
+    .card.unknown { border-left-color: var(--unknown); opacity: 0.55; }
+    .card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .label { font-size: 0.72rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+    .card.risk .badge { background: var(--risk); color: var(--bg); }
+    .card.warning .badge { background: var(--warning); color: var(--bg); }
+    .card.normal .badge { background: var(--success); color: var(--bg); }
+    .card.unknown .badge { background: var(--unknown); color: var(--text); }
+    .value { font-family: 'SF Mono', 'Menlo', Consolas, monospace; color: var(--text); font-size: 0.95rem; margin: 8px 0 10px; }
+    .value .gene { color: var(--primary); font-weight: 700; }
+    .desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
+    .annot { font-size: 0.78rem; color: var(--text-dim); margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+    .annot-row { margin-bottom: 4px; }
+    .annot-row:last-child { margin-bottom: 0; }
+    .annot strong { color: var(--primary); font-weight: 600; }
+
+    footer { text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+    footer a { color: var(--primary); text-decoration: none; }
+
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .section, .stat, .ai-synthesis, .critical-alert { background: white; border: 1px solid #ccc; box-shadow: none; page-break-inside: avoid; }
+      h1, .section > h2, .ai-synthesis h2, .critical-alert h3 { color: black; }
+      .card { background: #f9f9f9; }
+      .ai-synthesis { background: #fffbe6; }
+      .critical-alert { background: #fff0f0; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>OpenDNA Report</h1>
+      <p class="tagline">Local precision-medicine synthesis · not for clinical use</p>
+    </div>
+    <div class="meta">
+      <div>Generated</div>
+      <div class="big">{{ generated_at.split("T")[0] }}</div>
+      <div>{{ findings_total }} SNPs scanned · {{ findings_visible }} with data</div>
+    </div>
+  </header>
+
+  <div class="summary-row">
+    <div class="stat risk"><div class="num">{{ counts.risk }}</div><div class="lbl">Risk</div></div>
+    <div class="stat warning"><div class="num">{{ counts.warning }}</div><div class="lbl">Warnings</div></div>
+    <div class="stat normal"><div class="num">{{ counts.normal }}</div><div class="lbl">Normal</div></div>
+    <div class="stat unknown"><div class="num">{{ counts.unknown }}</div><div class="lbl">Not in file</div></div>
+  </div>
+
+  {% if critical_findings %}
+  <div class="critical-alert">
+    <h3>⚠ Critical findings</h3>
+    {% for f in critical_findings %}
+    <div class="item">
+      <strong>{{ f.gene }} ({{ f.rsid }} {{ f.genotype }}):</strong>
+      {{ f.note }}
+      {% if f.pharmgkb %}
+      <em>Drug considerations: {% for r in f.pharmgkb %}{{ r.drug }}{% if not loop.last %}, {% endif %}{% endfor %}.</em>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if llm_prose %}
+  <section class="ai-synthesis">
+    <h2>AI Synthesis</h2>
+    <pre>{{ llm_prose }}</pre>
+  </section>
+  {% endif %}
+
+  {% for panel_id, items in grouped.items() %}
+    {% set visible = items | selectattr("genotype") | list %}
+    {% if visible %}
+    <section class="section">
+      <h2>{{ panel_names.get(panel_id, panel_id|replace('_', ' ')|title) }}</h2>
+      <div class="grid">
+        {% for f in visible %}
+        <div class="card {{ f.tier }}">
+          <div class="card-header">
+            <div class="label">{{ f.gene }}</div>
+            <span class="badge">{{ f.tier }}</span>
+          </div>
+          <div class="value"><span class="gene">{{ f.genotype }}</span> · {{ f.rsid }}</div>
+          <div class="desc">{{ f.note }}</div>
+          {% if f.clinvar or f.pharmgkb %}
+          <div class="annot">
+            {% if f.clinvar %}
+            <div class="annot-row"><strong>ClinVar:</strong> {{ f.clinvar.clinical_significance }} — {{ f.clinvar.condition }}</div>
+            {% endif %}
+            {% if f.pharmgkb %}
+            {% for rec in f.pharmgkb %}
+            <div class="annot-row"><strong>{{ rec.drug|title }}:</strong> {{ rec.recommendation }}</div>
+            {% endfor %}
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  {% endfor %}
+
+  <footer>
+    Generated by <a href="https://github.com/corbett3000/OpenDNA">OpenDNA</a>
+    · ClinVar (NIH, public domain) · PharmGKB under CC BY-SA 4.0
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "id": "cognition",
+  "name": "Cognition & Mood",
+  "description": "Neurotransmitter-system variants affecting learning, mood, and neuroplasticity.",
+  "snps": [
+    {
+      "rsid": "rs6265",
+      "gene": "BDNF",
+      "variant_name": "Val66Met",
+      "description": "Brain-derived neurotrophic factor. Met allele (T) reduces activity-dependent BDNF secretion.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Val/Val — standard BDNF secretion."},
+        "CT": {"tier": "warning", "note": "Val/Met — modest reduction in activity-dependent plasticity."},
+        "TT": {"tier": "risk", "note": "Met/Met — reduced plasticity; aerobic exercise and novel learning particularly important."}
+      }
+    },
+    {
+      "rsid": "rs1800497",
+      "gene": "DRD2",
+      "variant_name": "ANKK1 TaqI A1",
+      "description": "Dopamine D2 receptor density — A1 allele reduces receptor density.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "A2/A2 — standard D2 receptor density."},
+        "AG": {"tier": "warning", "note": "A1/A2 — reduced density; associated with reward-seeking phenotypes."},
+        "AA": {"tier": "warning", "note": "A1/A1 — lowest density; higher reward threshold."}
+      }
+    },
+    {
+      "rsid": "rs53576",
+      "gene": "OXTR",
+      "variant_name": "Oxytocin receptor",
+      "description": "G allele associated with higher empathy and social sensitivity; A allele with lower.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Lower reported empathy / prosocial scores — trait-level."},
+        "AG": {"tier": "normal", "note": "Intermediate."},
+        "GG": {"tier": "normal", "note": "Higher reported empathy / prosocial scores."}
+      }
+    }
+  ]
+}

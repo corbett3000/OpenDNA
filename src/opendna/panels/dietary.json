@@ -1,0 +1,62 @@
+{
+  "id": "dietary",
+  "name": "Dietary Sensitivity & Nutrition",
+  "description": "Lactose, caffeine, alcohol, salt, omega-3 conversion, and bitter-taste variants.",
+  "snps": [
+    {
+      "rsid": "rs4988235",
+      "gene": "LCT",
+      "variant_name": "Lactase persistence",
+      "description": "T allele keeps lactase expressed into adulthood (Northern European origin).",
+      "interpretations": {
+        "CC": {"tier": "warning", "note": "Lactase non-persistent — likely lactose intolerant."},
+        "CT": {"tier": "normal", "note": "Lactase persistent."},
+        "TT": {"tier": "normal", "note": "Lactase persistent."}
+      }
+    },
+    {
+      "rsid": "rs762551",
+      "gene": "CYP1A2",
+      "variant_name": "Caffeine metabolism",
+      "description": "A allele is the fast-metabolizer variant; C allele is slow metabolizer (higher CV risk from caffeine).",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "Fast metabolizer — standard caffeine tolerance."},
+        "AC": {"tier": "warning", "note": "Slow metabolizer — caffeine persists longer; avoid late-day intake."},
+        "CC": {"tier": "warning", "note": "Slow metabolizer — high-dose caffeine may raise CV risk."}
+      }
+    },
+    {
+      "rsid": "rs671",
+      "gene": "ALDH2",
+      "variant_name": "Alcohol flush",
+      "description": "A allele (common in East Asian ancestry) causes acetaldehyde buildup and flushing response.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Normal alcohol metabolism."},
+        "AG": {"tier": "warning", "note": "Intermediate metabolism — flushing, elevated esophageal cancer risk with regular drinking."},
+        "AA": {"tier": "risk", "note": "Near-absent acetaldehyde clearance — strong flush, high cancer risk with regular drinking."}
+      }
+    },
+    {
+      "rsid": "rs174537",
+      "gene": "FADS1",
+      "variant_name": "Omega-3 conversion",
+      "description": "Controls ALA to EPA/DHA conversion efficiency. T allele = reduced conversion.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Efficient ALA to EPA/DHA conversion."},
+        "GT": {"tier": "warning", "note": "Moderate conversion — marine omega-3 more important."},
+        "TT": {"tier": "warning", "note": "Poor conversion — EPA/DHA supplementation recommended."}
+      }
+    },
+    {
+      "rsid": "rs713598",
+      "gene": "TAS2R38",
+      "variant_name": "Bitter taste (PTC)",
+      "description": "Detects bitter thiourea compounds in cruciferous vegetables.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Taster — may dislike Brussels sprouts, broccoli."},
+        "CG": {"tier": "normal", "note": "Intermediate."},
+        "GG": {"tier": "normal", "note": "Non-taster — less sensitivity to bitter compounds."}
+      }
+    }
+  ]
+}

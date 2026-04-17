@@ -1,0 +1,86 @@
+{
+  "rs1801133": {
+    "clinical_significance": "drug response",
+    "condition": "Homocystinuria; MTHFR deficiency",
+    "review_status": "reviewed by expert panel",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1801131": {
+    "clinical_significance": "not provided",
+    "condition": "MTHFR deficiency (compound heterozygous with C677T)",
+    "review_status": "multiple submitters, no conflicts",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs429358": {
+    "clinical_significance": "risk factor",
+    "condition": "Alzheimer disease; cardiovascular disease",
+    "review_status": "reviewed by expert panel",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs7412": {
+    "clinical_significance": "risk factor / protective",
+    "condition": "Type III hyperlipoproteinemia (homozygous e2)",
+    "review_status": "reviewed by expert panel",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1800562": {
+    "clinical_significance": "pathogenic",
+    "condition": "Hereditary hemochromatosis type 1",
+    "review_status": "reviewed by expert panel",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1799945": {
+    "clinical_significance": "risk factor",
+    "condition": "Hereditary hemochromatosis type 1 (low penetrance)",
+    "review_status": "reviewed by expert panel",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1800730": {
+    "clinical_significance": "uncertain significance",
+    "condition": "Hereditary hemochromatosis type 1",
+    "review_status": "multiple submitters",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1142345": {
+    "clinical_significance": "drug response",
+    "condition": "Thiopurine S-methyltransferase deficiency",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs4244285": {
+    "clinical_significance": "drug response",
+    "condition": "Clopidogrel response; CYP2C19-mediated drug metabolism",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs12248560": {
+    "clinical_significance": "drug response",
+    "condition": "CYP2C19 ultrarapid metabolism",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1799853": {
+    "clinical_significance": "drug response",
+    "condition": "Warfarin response; NSAID metabolism",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs1057910": {
+    "clinical_significance": "drug response",
+    "condition": "Warfarin response; NSAID metabolism",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs9923231": {
+    "clinical_significance": "drug response",
+    "condition": "Warfarin sensitivity",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs4149056": {
+    "clinical_significance": "drug response",
+    "condition": "Simvastatin-induced myopathy",
+    "review_status": "reviewed by expert panel (PharmGKB)",
+    "source": "ClinVar 2026-03 snapshot"
+  }
+}
