@@ -54,10 +54,14 @@ def test_analyze_handles_reverse_complement_genotype() -> None:
     hit = next(f for f in findings if f.rsid == "rs1801133")
     assert hit.tier == "normal"   # GG → RC → CC → normal
     assert hit.genotype == "GG"   # preserve the raw genotype in the finding
+    assert hit.interpreted_genotype == "CC"
+    assert hit.match_method == "reverse_complement"
+    assert hit.confidence_label == "high"
 
     findings = analyze({"rs1801133": "AA"}, panels)
     hit = next(f for f in findings if f.rsid == "rs1801133")
     assert hit.tier == "risk"     # AA → RC → TT → risk
+    assert hit.interpreted_genotype == "TT"
 
 
 def test_analyze_skips_reverse_complement_for_palindromic_sites() -> None:
@@ -88,3 +92,13 @@ def test_analyze_skips_reverse_complement_for_palindromic_sites() -> None:
     findings = analyze({"rs9000001": "CC"}, [palindromic_panel])
     assert len(findings) == 1
     assert findings[0].tier == "unknown"
+
+
+def test_analyze_marks_no_calls_explicitly() -> None:
+    panels = [p for p in load_panels() if p.id == "methylation"]
+    findings = analyze({"rs1801133": "--"}, panels)
+    hit = next(f for f in findings if f.rsid == "rs1801133")
+    assert hit.call_status == "no_call"
+    assert hit.match_method == "no_call"
+    assert hit.confidence_score == 0
+    assert hit.tier == "unknown"

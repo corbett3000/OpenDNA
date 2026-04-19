@@ -1,7 +1,13 @@
 import json
+from pathlib import Path
 
+from opendna.analyzer import analyze
+from opendna.annotations import annotate, load_clinvar, load_pharmgkb
 from opendna.models import Finding
+from opendna.panels import load_panels
+from opendna.parser import parse_source_file
 from opendna.report import render_report
+from opendna.summaries import build_analysis_summary
 
 
 def _sample_findings() -> list[Finding]:
@@ -80,3 +86,15 @@ def test_render_report_escapes_html_in_prose() -> None:
     bundle = render_report(_sample_findings(), llm_prose="<script>alert('xss')</script>")
     assert "<script>" not in bundle.html
     assert "&lt;script&gt;" in bundle.html
+
+
+def test_render_report_includes_source_qc_and_composite_sections(fixtures_dir: Path) -> None:
+    parsed = parse_source_file(fixtures_dir / "sample_23andme.txt")
+    panels = load_panels()
+    findings = annotate(analyze(parsed.genotypes, panels), load_clinvar(), load_pharmgkb())
+    summary = build_analysis_summary(findings, panels)
+    bundle = render_report(findings, source_file=parsed.source, analysis_summary=summary)
+    assert "Source File Quality" in bundle.html
+    assert "Composite Calls" in bundle.html
+    assert "Cross-Panel Gene View" in bundle.html
+    assert bundle.json_payload["source_file"]["vendor"] == "23andMe"
