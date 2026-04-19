@@ -106,6 +106,18 @@
       }
     ]
   },
+  "rs2108622": {
+    "gene": "CYP4F2",
+    "recommendations": [
+      {
+        "drug": "warfarin",
+        "diplotype": "*3 carrier",
+        "recommendation": "Use a CYP2C9/VKORC1-guided dosing algorithm and recognize that CYP4F2 carriers can need a modestly higher dose.",
+        "evidence_level": "2A",
+        "source": "CPIC 2017"
+      }
+    ]
+  },
   "rs4149056": {
     "gene": "SLCO1B1",
     "recommendations": [

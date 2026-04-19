@@ -19,6 +19,8 @@ def test_full_pipeline_rule_based(fixtures_dir: Path) -> None:
     body = resp.json()
     assert body["report_html"].startswith("<!DOCTYPE html>")
     payload = body["report_json"]
+    assert payload["source_file"]["vendor"] == "23andMe"
+    assert "analysis_summary" in payload
 
     rsids = {f["rsid"] for f in payload["findings"] if f["genotype"]}
     assert "rs1801133" in rsids
@@ -29,6 +31,10 @@ def test_full_pipeline_rule_based(fixtures_dir: Path) -> None:
     tpmt = next(f for f in payload["findings"] if f["rsid"] == "rs1142345")
     assert tpmt["tier"] == "risk"
     assert tpmt["pharmgkb"] is not None
+
+    derived_ids = {item["id"] for item in payload["analysis_summary"]["derived_insights"]}
+    assert "mthfr" in derived_ids
+    assert "apoe" in derived_ids
 
 
 def test_full_pipeline_with_mocked_llm(fixtures_dir: Path) -> None:

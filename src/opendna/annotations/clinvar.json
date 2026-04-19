@@ -82,5 +82,17 @@
     "condition": "Simvastatin-induced myopathy",
     "review_status": "reviewed by expert panel (PharmGKB)",
     "source": "ClinVar 2026-03 snapshot"
+  },
+  "rs6025": {
+    "clinical_significance": "pathogenic / risk factor",
+    "condition": "Factor V Leiden thrombophilia; venous thromboembolism",
+    "review_status": "multiple submitters",
+    "source": "ClinVar 2026-04 snapshot"
+  },
+  "rs1799963": {
+    "clinical_significance": "pathogenic (low penetrance)",
+    "condition": "Prothrombin-related thrombophilia; venous thromboembolism",
+    "review_status": "multiple submitters",
+    "source": "ClinVar 2026-04 snapshot"
   }
 }

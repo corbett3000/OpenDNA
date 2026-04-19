@@ -1,7 +1,7 @@
 {
   "id": "cardiovascular",
   "name": "Cardiovascular & Longevity",
-  "description": "Variants associated with coronary artery disease risk and lifespan.",
+  "description": "Variants associated with coronary artery disease risk, thrombosis, and lifespan.",
   "snps": [
     {
       "rsid": "rs429358",
@@ -56,6 +56,28 @@
         "TT": {"tier": "normal", "note": "Not a risk carrier."},
         "CT": {"tier": "risk", "note": "Risk allele present — consider measuring Lp(a)."},
         "CC": {"tier": "risk", "note": "Homozygous risk — strongly associated with elevated Lp(a)."}
+      }
+    },
+    {
+      "rsid": "rs6025",
+      "gene": "F5",
+      "variant_name": "Factor V Leiden",
+      "description": "Classic inherited thrombophilia variant; venous clot risk rises further with estrogen, surgery, pregnancy, or immobility.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No Factor V Leiden variant detected at this site."},
+        "CT": {"tier": "warning", "note": "Factor V Leiden carrier — baseline venous clot risk is meaningfully elevated."},
+        "TT": {"tier": "risk", "note": "Factor V Leiden homozygous — strongest common inherited clotting-risk pattern in this file type."}
+      }
+    },
+    {
+      "rsid": "rs1799963",
+      "gene": "F2",
+      "variant_name": "Prothrombin G20210A",
+      "description": "Common inherited thrombophilia variant associated with higher prothrombin levels and venous thrombosis risk.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No prothrombin G20210A variant detected at this site."},
+        "AG": {"tier": "warning", "note": "Carrier — venous thrombosis risk is elevated versus baseline."},
+        "AA": {"tier": "risk", "note": "Homozygous carrier — higher clotting-risk signal than heterozygous carriage."}
       }
     }
   ]

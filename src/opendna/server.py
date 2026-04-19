@@ -21,8 +21,9 @@ from opendna.annotations import annotate, load_clinvar, load_pharmgkb
 from opendna.annotations.updater import refresh
 from opendna.llm import get_provider
 from opendna.panels import load_panels
-from opendna.parser import parse_23andme
+from opendna.parser import parse_source_file
 from opendna.report import render_report
+from opendna.summaries import build_analysis_summary
 
 logger = logging.getLogger("opendna.server")
 
@@ -67,14 +68,15 @@ def analyze_endpoint(req: AnalyzeRequest) -> JSONResponse:
         raise HTTPException(status_code=400, detail=f"File not found: {req.file_path}")
 
     try:
-        parsed = parse_23andme(path)
+        parsed = parse_source_file(path)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Parse error: {exc}") from exc
 
     panels = load_panels()
     selected = set(req.selected_panels) if req.selected_panels else None
-    findings = analyze(parsed, panels, selected_panel_ids=selected)
+    findings = analyze(parsed.genotypes, panels, selected_panel_ids=selected)
     findings = annotate(findings, load_clinvar(), load_pharmgkb())
+    summary = build_analysis_summary(findings, panels)
 
     prose: str | None = None
     if req.llm is not None:
@@ -86,7 +88,12 @@ def analyze_endpoint(req: AnalyzeRequest) -> JSONResponse:
             logger.exception("LLM synthesis failed")
             raise HTTPException(status_code=502, detail=f"LLM provider error: {exc}") from exc
 
-    bundle = render_report(findings, llm_prose=prose)
+    bundle = render_report(
+        findings,
+        llm_prose=prose,
+        source_file=parsed.source,
+        analysis_summary=summary,
+    )
     return JSONResponse({
         "report_html": bundle.html,
         "report_json": bundle.json_payload,
@@ -107,13 +114,21 @@ def _analyze_stream_generator(req: AnalyzeRequest) -> Iterator[str]:
 
         yield _sse_event("progress", stage="parse", message="Parsing DNA file", pct=12)
         try:
-            parsed = parse_23andme(path)
+            parsed = parse_source_file(path)
         except Exception as exc:
             yield _sse_event("error", detail=f"Parse error: {exc}")
             return
         yield _sse_event(
             "progress", stage="parse",
-            message=f"Parsed {len(parsed):,} SNPs from file", pct=30,
+            message=(
+                f"Parsed {parsed.source.unique_rsid_count:,} SNPs"
+                + (
+                    f" ({parsed.source.vendor}, {parsed.source.build or 'build unknown'})"
+                    if parsed.source.vendor
+                    else ""
+                )
+            ),
+            pct=30,
         )
 
         yield _sse_event(
@@ -122,7 +137,7 @@ def _analyze_stream_generator(req: AnalyzeRequest) -> Iterator[str]:
         )
         panels = load_panels()
         selected = set(req.selected_panels) if req.selected_panels else None
-        findings = analyze(parsed, panels, selected_panel_ids=selected)
+        findings = analyze(parsed.genotypes, panels, selected_panel_ids=selected)
         matched = sum(1 for f in findings if f.genotype is not None)
         yield _sse_event(
             "progress", stage="analyze",
@@ -135,6 +150,7 @@ def _analyze_stream_generator(req: AnalyzeRequest) -> Iterator[str]:
             message="Joining ClinVar + PharmGKB annotations", pct=62,
         )
         findings = annotate(findings, load_clinvar(), load_pharmgkb())
+        summary = build_analysis_summary(findings, panels)
 
         prose: str | None = None
         if req.llm is not None:
@@ -157,7 +173,12 @@ def _analyze_stream_generator(req: AnalyzeRequest) -> Iterator[str]:
                 return
 
         yield _sse_event("progress", stage="render", message="Rendering report", pct=95)
-        bundle = render_report(findings, llm_prose=prose)
+        bundle = render_report(
+            findings,
+            llm_prose=prose,
+            source_file=parsed.source,
+            analysis_summary=summary,
+        )
         yield _sse_event(
             "complete", pct=100,
             report_html=bundle.html,

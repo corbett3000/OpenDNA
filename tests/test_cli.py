@@ -26,6 +26,8 @@ def test_cmd_scan_writes_html_and_json_alongside_input(tmp_path: Path) -> None:
     assert html.exists() and js.exists()
     payload = json.loads(js.read_text())
     assert payload["findings_count"] >= 2
+    assert payload["source_file"]["unique_rsid_count"] == 2
+    assert "analysis_summary" in payload
 
 
 def test_cmd_update_db_prints_status(capsys) -> None:

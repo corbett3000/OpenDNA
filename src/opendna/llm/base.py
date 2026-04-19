@@ -18,7 +18,10 @@ def findings_to_prompt(findings: list[Finding]) -> str:
     """Render findings as a compact structured block for the LLM."""
     lines = []
     for f in findings:
-        line = f"[{f.tier}] {f.gene} {f.rsid} = {f.genotype or '--'} ({f.panel_id}) — {f.note}"
+        if f.call_status != "called":
+            continue
+        display_genotype = f.interpreted_genotype or f.genotype or "--"
+        line = f"[{f.tier}] {f.gene} {f.rsid} = {display_genotype} ({f.panel_id}) — {f.note}"
         if f.clinvar:
             line += f" | ClinVar: {f.clinvar['clinical_significance']}"
         if f.pharmgkb:

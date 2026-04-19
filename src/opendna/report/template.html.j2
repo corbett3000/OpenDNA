@@ -7,21 +7,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #FFD700;
-      --risk: #FF4D4D;
-      --warning: #FFB300;
-      --success: #00E676;
-      --unknown: #666;
-      --bg: #0A0A0A;
-      --card-bg: #1A1A1A;
-      --card-item: rgba(255,255,255,0.03);
-      --text: #F0F0F0;
-      --text-dim: #A0A0A0;
+      --primary: #ffd700;
+      --risk: #ff4d4d;
+      --warning: #ffb300;
+      --success: #00e676;
+      --unknown: #7d8593;
+      --bg: #0a0a0a;
+      --card-bg: #171717;
+      --card-item: rgba(255,255,255,0.04);
+      --text: #f0f0f0;
+      --text-dim: #a0a0a0;
       --border: #333;
+      --info: #7cc7ff;
     }
     * { box-sizing: border-box; }
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; line-height: 1.6; }
-    .container { max-width: 960px; margin: 0 auto; }
+    .container { max-width: 1040px; margin: 0 auto; }
     header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 32px; gap: 20px; flex-wrap: wrap; }
     h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: -1px; }
     .tagline { color: var(--text-dim); margin: 4px 0 0; font-size: 0.95rem; }
@@ -33,58 +34,90 @@
     .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
     .stat .num { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
     .stat .lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .stat .sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; }
     .stat.risk .num { color: var(--risk); }
     .stat.warning .num { color: var(--warning); }
     .stat.normal .num { color: var(--success); }
     .stat.unknown .num { color: var(--unknown); }
 
+    .section { margin-bottom: 28px; background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .section > h2 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 0 0 20px; padding-bottom: 10px; color: var(--primary); border-bottom: 1px solid var(--border); }
+    .section-intro { margin: -6px 0 18px; color: var(--text-dim); font-size: 0.92rem; }
+
+    .info-grid, .grid, .derived-grid, .coverage-grid, .gene-grid { display: grid; gap: 16px; }
+    .info-grid { grid-template-columns: repeat(4, 1fr); }
+    .coverage-grid { grid-template-columns: repeat(2, 1fr); }
+    .derived-grid, .gene-grid, .grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 720px) { .coverage-grid, .derived-grid, .gene-grid, .grid { grid-template-columns: 1fr; } }
+
+    .info-card, .coverage-card, .derived-card, .gene-card, .card {
+      background: var(--card-item);
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .info-card .eyebrow, .coverage-card .eyebrow, .card .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .info-card .value, .coverage-card .value, .derived-card .value, .gene-card .value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .muted { color: var(--text-dim); }
+    .small { font-size: 0.85rem; color: var(--text-dim); }
+    .list { margin: 0; padding-left: 20px; color: var(--text-dim); }
+    .list li + li { margin-top: 8px; }
+
     .critical-alert { background: rgba(255,77,77,0.08); border: 2px solid var(--risk); padding: 20px 24px; border-radius: 12px; margin-bottom: 28px; }
     .critical-alert h3 { font-family: 'Outfit', sans-serif; margin: 0 0 14px; color: var(--risk); text-transform: uppercase; font-size: 1.05rem; letter-spacing: 1px; }
     .critical-alert .item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,77,77,0.25); font-size: 0.95rem; }
     .critical-alert .item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
-    .critical-alert strong { color: var(--text); }
-    .critical-alert em { color: var(--text-dim); font-style: italic; }
 
     .ai-synthesis { background: rgba(255,215,0,0.06); border: 1px solid var(--primary); border-radius: 16px; padding: 28px; margin-bottom: 32px; }
     .ai-synthesis h2 { font-family: 'Outfit', sans-serif; margin: 0 0 16px; color: var(--primary); font-size: 1.35rem; font-weight: 600; }
     .ai-synthesis pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.7; font-size: 0.95rem; }
 
-    .section { margin-bottom: 28px; background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-    .section > h2 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 0 0 20px; padding-bottom: 10px; color: var(--primary); border-bottom: 1px solid var(--border); }
+    .badge-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .risk .badge { background: var(--risk); color: var(--bg); }
+    .warning .badge { background: var(--warning); color: var(--bg); }
+    .normal .badge { background: var(--success); color: var(--bg); }
+    .unknown .badge { background: var(--unknown); color: var(--text); }
+    .badge.info { background: rgba(124,199,255,0.18); color: var(--info); }
 
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .card { border-left: 4px solid var(--border); display: flex; flex-direction: column; }
+    .card.risk, .derived-card.risk, .gene-card.risk { border-left: 4px solid var(--risk); }
+    .card.warning, .derived-card.warning, .gene-card.warning { border-left: 4px solid var(--warning); }
+    .card.normal, .derived-card.normal, .gene-card.normal { border-left: 4px solid var(--success); }
+    .card.unknown, .derived-card.unknown, .gene-card.unknown { border-left: 4px solid var(--unknown); }
 
-    .card { background: var(--card-item); padding: 16px 18px; border-radius: 12px; border-left: 4px solid var(--border); display: flex; flex-direction: column; }
-    .card.risk { border-left-color: var(--risk); }
-    .card.warning { border-left-color: var(--warning); }
-    .card.normal { border-left-color: var(--success); }
-    .card.unknown { border-left-color: var(--unknown); opacity: 0.55; }
-    .card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-    .label { font-size: 0.72rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
-    .card.risk .badge { background: var(--risk); color: var(--bg); }
-    .card.warning .badge { background: var(--warning); color: var(--bg); }
-    .card.normal .badge { background: var(--success); color: var(--bg); }
-    .card.unknown .badge { background: var(--unknown); color: var(--text); }
-    .value { font-family: 'SF Mono', 'Menlo', Consolas, monospace; color: var(--text); font-size: 0.95rem; margin: 8px 0 10px; }
-    .value .gene { color: var(--primary); font-weight: 700; }
-    .desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
-    .annot { font-size: 0.78rem; color: var(--text-dim); margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
-    .annot-row { margin-bottom: 4px; }
-    .annot-row:last-child { margin-bottom: 0; }
-    .annot strong { color: var(--primary); font-weight: 600; }
+    .derived-card h3, .gene-card h3 { margin: 0 0 8px; font-size: 1rem; color: var(--text); }
+    .derived-card p, .gene-card p, .card .desc { margin: 0; font-size: 0.9rem; color: var(--text-dim); line-height: 1.55; }
+    .derived-meta, .gene-meta, .finding-meta { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.78rem; color: var(--text-dim); }
+    .finding-meta .row, .derived-meta .row, .gene-meta .row { margin-bottom: 4px; }
+    .finding-meta .row:last-child, .derived-meta .row:last-child, .gene-meta .row:last-child { margin-bottom: 0; }
+    .finding-meta strong, .derived-meta strong, .gene-meta strong { color: var(--primary); font-weight: 600; }
+
+    .card .value { font-family: 'SF Mono', 'Menlo', Consolas, monospace; color: var(--text); font-size: 0.95rem; margin: 0 0 10px; }
+    .confidence { color: var(--info); }
+    .caveat { color: #e7d6a8; }
 
     footer { text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
     footer a { color: var(--primary); text-decoration: none; }
 
     @media print {
       body { background: white; color: black; padding: 0; }
-      .section, .stat, .ai-synthesis, .critical-alert { background: white; border: 1px solid #ccc; box-shadow: none; page-break-inside: avoid; }
+      .section, .stat, .ai-synthesis, .critical-alert, .info-card, .coverage-card, .derived-card, .gene-card, .card { background: white; border: 1px solid #ccc; box-shadow: none; }
       h1, .section > h2, .ai-synthesis h2, .critical-alert h3 { color: black; }
-      .card { background: #f9f9f9; }
-      .ai-synthesis { background: #fffbe6; }
-      .critical-alert { background: #fff0f0; }
+      .badge.info { color: #004b7a; }
     }
   </style>
 </head>
@@ -98,30 +131,161 @@
     <div class="meta">
       <div>Generated</div>
       <div class="big">{{ generated_at.split("T")[0] }}</div>
-      <div>{{ findings_total }} SNPs scanned · {{ findings_visible }} with data</div>
+      <div>{{ findings_total }} target SNPs · {{ findings_visible }} confidently assessed</div>
     </div>
   </header>
 
   <div class="summary-row">
-    <div class="stat risk"><div class="num">{{ counts.risk }}</div><div class="lbl">Risk</div></div>
-    <div class="stat warning"><div class="num">{{ counts.warning }}</div><div class="lbl">Warnings</div></div>
-    <div class="stat normal"><div class="num">{{ counts.normal }}</div><div class="lbl">Normal</div></div>
-    <div class="stat unknown"><div class="num">{{ counts.unknown }}</div><div class="lbl">Not in file</div></div>
+    <div class="stat risk">
+      <div class="num">{{ counts.risk }}</div>
+      <div class="lbl">Risk</div>
+    </div>
+    <div class="stat warning">
+      <div class="num">{{ counts.warning }}</div>
+      <div class="lbl">Warnings</div>
+    </div>
+    <div class="stat normal">
+      <div class="num">{{ counts.normal }}</div>
+      <div class="lbl">Normal</div>
+    </div>
+    <div class="stat unknown">
+      <div class="num">{{ counts.unknown }}</div>
+      <div class="lbl">Unresolved</div>
+      <div class="sub">not on chip, no-call, ambiguous, or not interpreted</div>
+    </div>
   </div>
+
+  {% if source_file %}
+  <section class="section">
+    <h2>Source File Quality</h2>
+    <p class="section-intro">These checks describe what this raw DNA file can and cannot support. Missing markers should be read as “not assessed,” not as a negative result.</p>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="eyebrow">Vendor</div>
+        <p class="value">{{ source_file.vendor or "Unknown" }}</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">Reference Build</div>
+        <p class="value">{{ source_file.build or "Unknown" }}</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">Unique Rsids</div>
+        <p class="value">{{ source_file.unique_rsid_count }}</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">No-Calls / Ambiguous</div>
+        <p class="value">{{ source_file.no_call_count }} / {{ source_file.ambiguous_call_count }}</p>
+      </div>
+    </div>
+    {% if source_file.issues %}
+    <div style="margin-top: 18px;">
+      <div class="small" style="margin-bottom: 8px;">QC notes</div>
+      <ul class="list">
+        {% for issue in source_file.issues %}
+        <li><strong>{{ issue.severity|title }}:</strong> {{ issue.message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if source_file.blind_spots %}
+    <div style="margin-top: 18px;">
+      <div class="small" style="margin-bottom: 8px;">Known blind spots for this file type</div>
+      <ul class="list">
+        {% for note in source_file.blind_spots %}
+        <li>{{ note }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
 
   {% if critical_findings %}
   <div class="critical-alert">
-    <h3>⚠ Critical findings</h3>
+    <h3>Critical Findings</h3>
     {% for f in critical_findings %}
     <div class="item">
-      <strong>{{ f.gene }} ({{ f.rsid }} {{ f.genotype }}):</strong>
+      <strong>{{ f.gene }} ({{ f.rsid }} {{ f.interpreted_genotype or f.genotype }}):</strong>
       {{ f.note }}
       {% if f.pharmgkb %}
-      <em>Drug considerations: {% for r in f.pharmgkb %}{{ r.drug }}{% if not loop.last %}, {% endif %}{% endfor %}.</em>
+      Drug considerations:
+      {% for r in f.pharmgkb %}
+      {{ r.drug }}{% if not loop.last %}, {% endif %}
+      {% endfor %}.
       {% endif %}
     </div>
     {% endfor %}
   </div>
+  {% endif %}
+
+  {% if analysis_summary.derived_insights %}
+  <section class="section">
+    <h2>Composite Calls</h2>
+    <p class="section-intro">These combine multiple source-file markers into a single interpretation, which is usually more useful than reading each rsid in isolation.</p>
+    <div class="derived-grid">
+      {% for insight in analysis_summary.derived_insights %}
+      <div class="derived-card {{ insight.tier }}">
+        <div class="badge-row">
+          <h3>{{ insight.title }}</h3>
+          <span class="badge">{{ insight.tier }}</span>
+        </div>
+        <p>{{ insight.summary }}</p>
+        <div class="derived-meta">
+          <div class="row"><strong>Genes:</strong> {{ insight.genes | join(", ") }}</div>
+          <div class="row"><strong>Inputs:</strong> {{ insight.rsids | join(", ") }}</div>
+          <div class="row"><strong>Confidence:</strong> <span class="confidence">{{ (insight.confidence_score * 100) | round | int }}%</span> · {{ insight.confidence_label }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if analysis_summary.panel_summaries %}
+  <section class="section">
+    <h2>Panel Coverage</h2>
+    <p class="section-intro">A section is only as good as the markers this file actually covered. These counts separate assessed markers from missing or unusable ones.</p>
+    <div class="coverage-grid">
+      {% for panel in analysis_summary.panel_summaries %}
+      <div class="coverage-card">
+        <div class="eyebrow">{{ panel.panel_name }}</div>
+        <p class="value">{{ panel.called_count }}/{{ panel.total_snps }}</p>
+        <div class="small">assessed · {{ panel.assessed_pct }}%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> {{ panel.not_tested_count }}</div>
+          <div class="row"><strong>No-call:</strong> {{ panel.no_call_count }}</div>
+          <div class="row"><strong>Ambiguous:</strong> {{ panel.ambiguous_count }}</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> {{ panel.risk_count }} / {{ panel.warning_count }} / {{ panel.normal_count }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if analysis_summary.gene_summaries %}
+  <section class="section">
+    <h2>Cross-Panel Gene View</h2>
+    <p class="section-intro">These roll up duplicate or multi-marker genes so the analysis reads at the gene level, not just the panel level.</p>
+    <div class="gene-grid">
+      {% for gene in analysis_summary.gene_summaries %}
+      <div class="gene-card {{ gene.tier }}">
+        <div class="badge-row">
+          <h3>{{ gene.gene }}</h3>
+          <span class="badge">{{ gene.tier }}</span>
+        </div>
+        <p>{{ gene.summary }}</p>
+        <div class="gene-meta">
+          <div class="row"><strong>Panels:</strong> {{ gene.panels | join(", ") }}</div>
+          <div class="row"><strong>Rsids:</strong> {{ gene.rsids | join(", ") }}</div>
+          {% if gene.caveat %}
+          <div class="row caveat"><strong>Boundary:</strong> {{ gene.caveat }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
   {% endif %}
 
   {% if llm_prose %}
@@ -132,31 +296,49 @@
   {% endif %}
 
   {% for panel_id, items in grouped.items() %}
-    {% set visible = items | selectattr("genotype") | list %}
+    {% set visible = items | selectattr("call_status", "equalto", "called") | list %}
+    {% set panel_summary = panel_summary_map.get(panel_id) %}
     {% if visible %}
     <section class="section">
       <h2>{{ panel_names.get(panel_id, panel_id|replace('_', ' ')|title) }}</h2>
+      {% if panel_summary %}
+      <p class="section-intro">
+        {{ panel_summary.called_count }}/{{ panel_summary.total_snps }} assessed ·
+        {{ panel_summary.not_tested_count }} not on chip ·
+        {{ panel_summary.no_call_count }} no-call ·
+        {{ panel_summary.ambiguous_count }} ambiguous
+      </p>
+      {% endif %}
       <div class="grid">
         {% for f in visible %}
         <div class="card {{ f.tier }}">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">{{ f.gene }}</div>
             <span class="badge">{{ f.tier }}</span>
           </div>
-          <div class="value"><span class="gene">{{ f.genotype }}</span> · {{ f.rsid }}</div>
+          <div class="value">
+            {{ f.interpreted_genotype or f.genotype }} · {{ f.rsid }}
+            {% if f.interpreted_genotype and f.genotype and f.interpreted_genotype != f.genotype %}
+            <span class="muted">(raw {{ f.genotype }})</span>
+            {% endif %}
+          </div>
           <div class="desc">{{ f.note }}</div>
-          {% if f.clinvar or f.pharmgkb %}
-          <div class="annot">
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">{{ (f.confidence_score * 100) | round | int }}%</span> · {{ f.confidence_label }} via {{ f.match_method|replace("_", " ") }}</div>
+            {% if gene_caveats.get(f.gene) %}
+            <div class="row caveat"><strong>Boundary:</strong> {{ gene_caveats.get(f.gene) }}</div>
+            {% endif %}
             {% if f.clinvar %}
-            <div class="annot-row"><strong>ClinVar:</strong> {{ f.clinvar.clinical_significance }} — {{ f.clinvar.condition }}</div>
+            <div class="row"><strong>ClinVar:</strong> {{ f.clinvar.clinical_significance }} — {{ f.clinvar.condition }}</div>
+            <div class="row"><strong>ClinVar review:</strong> {{ f.clinvar.review_status }}{% if f.clinvar.source %} · {{ f.clinvar.source }}{% endif %}</div>
             {% endif %}
             {% if f.pharmgkb %}
             {% for rec in f.pharmgkb %}
-            <div class="annot-row"><strong>{{ rec.drug|title }}:</strong> {{ rec.recommendation }}</div>
+            <div class="row"><strong>{{ rec.drug|title }}:</strong> {{ rec.recommendation }}</div>
+            <div class="row"><strong>PGx evidence:</strong> {{ rec.evidence_level }}{% if rec.source %} · {{ rec.source }}{% endif %}</div>
             {% endfor %}
             {% endif %}
           </div>
-          {% endif %}
         </div>
         {% endfor %}
       </div>
@@ -166,7 +348,7 @@
 
   <footer>
     Generated by <a href="https://github.com/corbett3000/OpenDNA">OpenDNA</a>
-    · ClinVar (NIH, public domain) · PharmGKB under CC BY-SA 4.0
+    · ClinVar (NIH, public domain) · PharmGKB / CPIC under CC BY-SA 4.0
   </footer>
 </div>
 </body>

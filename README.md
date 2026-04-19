@@ -6,7 +6,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 
-**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 8 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, cognition, stimulant sensitivity), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
+**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 8 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, cognition, stimulant sensitivity), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker genes like APOE, HFE, MTHFR, CYP2C19, and warfarin PGx into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
 
 **What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis, OpenDNA sends the filtered *findings* (rsid + gene + genotype + tier + short note; roughly 40–50 lines of structured text) to the provider you chose. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
 
@@ -86,6 +86,8 @@ opendna --version
 pytest -v                           # (only if you installed [dev])
 ```
 
+Current contributor baseline: `51` tests passing.
+
 ---
 
 ## Quickstart — the web UI
@@ -135,13 +137,13 @@ The JSON schema is stable and suitable for ingestion by another pipeline stage.
 
 ## What OpenDNA interprets
 
-Every finding is tier-scored (`risk` / `warning` / `normal` / `unknown`) and, where available, cross-referenced with ClinVar clinical significance and PharmGKB/CPIC dosing guidelines.
+Every finding is tier-scored (`risk` / `warning` / `normal` / `unknown`), annotated with match confidence, and, where available, cross-referenced with ClinVar clinical significance and PharmGKB/CPIC dosing guidelines. The report also separates `not on chip`, `no-call`, and `ambiguous` markers so missing data is not misread as a negative result.
 
 | Panel | Focus | Representative genes |
 |---|---|---|
-| **Cardiovascular & Longevity** | CAD risk, lifespan | APOE, 9p21, FOXO3, LPA |
+| **Cardiovascular & Longevity** | CAD risk, thrombosis, lifespan | APOE, 9p21, FOXO3, LPA, F5, F2 |
 | **Methylation & Detox** | Folate/B12 cycle | MTHFR, COMT, MTR/MTRR, FUT2, CBS, VDR |
-| **Pharmacogenomics (PGx)** | Drug metabolism | CYP2C19, CYP2C9, VKORC1, SLCO1B1, TPMT, CYP3A5 |
+| **Pharmacogenomics (PGx)** | Drug metabolism | CYP2C19, CYP2C9, VKORC1, CYP4F2, SLCO1B1, TPMT, CYP3A5 |
 | **Athletic Performance & Recovery** | Fiber type, recovery | ACTN3, PPARA, PPARGC1A, COL5A1, IL6 |
 | **Dietary Sensitivity** | Lactose, caffeine, alcohol, omega-3 | LCT, CYP1A2, ALDH2, FADS1, TAS2R38 |
 | **Iron Metabolism (HFE)** | Hemochromatosis | C282Y, H63D, S65C |
@@ -149,6 +151,12 @@ Every finding is tier-scored (`risk` / `warning` / `normal` / `unknown`) and, wh
 | **Stimulant Sensitivity** | Caffeine/adenosine | ADORA2A, CYP1A2, COMT |
 
 The analyzer automatically handles both **allele-order variations** (`AG` == `GA`) and **reverse-strand reports** (panel `CC` matches file `GG` for C/T SNPs), so genotypes from any major consumer-testing vendor should resolve correctly.
+
+### Source-file caveats, now surfaced in the report
+
+- `Not on chip` means the marker was not present in the source file. It does **not** mean the user has a reassuring genotype there.
+- `No-call` means the vendor included the marker but did not make a confident genotype call.
+- Composite calls are only made where the source file type can support them. OpenDNA still does **not** infer rare variants, structural variants, HLA types, CYP2D6 star alleles, or methylation from array data.
 
 ---
 

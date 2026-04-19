@@ -59,6 +59,17 @@
       }
     },
     {
+      "rsid": "rs2108622",
+      "gene": "CYP4F2",
+      "variant_name": "*3 (V433M)",
+      "description": "Modestly increases warfarin dose requirement; most useful when combined with CYP2C9 and VKORC1.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Baseline CYP4F2 contribution to warfarin dosing."},
+        "CT": {"tier": "warning", "note": "Variant present — some patients need a modestly higher warfarin dose than CYP2C9/VKORC1 alone would predict."},
+        "TT": {"tier": "warning", "note": "Strongest common CYP4F2 dose-increase signal; pair with CYP2C9 and VKORC1 rather than reading in isolation."}
+      }
+    },
+    {
       "rsid": "rs4149056",
       "gene": "SLCO1B1",
       "variant_name": "*5 statin myopathy risk",

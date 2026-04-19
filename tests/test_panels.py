@@ -36,6 +36,15 @@ def test_methylation_panel_has_known_snps() -> None:
     assert "rs4680" in rsids     # COMT
 
 
+def test_expanded_panels_include_new_high_signal_markers() -> None:
+    panels = {p.id: p for p in load_panels()}
+    cardio_rsids = {s.rsid for s in panels["cardiovascular"].snps}
+    pgx_rsids = {s.rsid for s in panels["pharmacogenomics"].snps}
+    assert "rs6025" in cardio_rsids   # F5 Factor V Leiden
+    assert "rs1799963" in cardio_rsids  # F2 prothrombin G20210A
+    assert "rs2108622" in pgx_rsids  # CYP4F2 warfarin modifier
+
+
 def test_snp_interpretations_are_indexed_by_genotype() -> None:
     panels = {p.id: p for p in load_panels()}
     mthfr = next(s for s in panels["methylation"].snps if s.rsid == "rs1801133")

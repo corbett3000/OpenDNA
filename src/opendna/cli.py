@@ -11,8 +11,9 @@ from opendna.analyzer import analyze
 from opendna.annotations import annotate, load_clinvar, load_pharmgkb
 from opendna.annotations.updater import refresh
 from opendna.panels import load_panels
-from opendna.parser import parse_23andme
+from opendna.parser import parse_source_file
 from opendna.report import render_report
+from opendna.summaries import build_analysis_summary
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -56,12 +57,16 @@ def cmd_scan(args: argparse.Namespace) -> int:
     if not input_path.exists():
         print(f"error: file not found: {input_path}", file=sys.stderr)
         return 1
-    parsed = parse_23andme(input_path)
+    parsed = parse_source_file(input_path)
     panels = load_panels()
     selected = set(args.panels) if args.panels else None
-    findings = analyze(parsed, panels, selected_panel_ids=selected)
+    findings = analyze(parsed.genotypes, panels, selected_panel_ids=selected)
     findings = annotate(findings, load_clinvar(), load_pharmgkb())
-    bundle = render_report(findings)
+    bundle = render_report(
+        findings,
+        source_file=parsed.source,
+        analysis_summary=build_analysis_summary(findings, panels),
+    )
 
     html_out = input_path.with_name(input_path.stem + ".opendna.html")
     json_out = input_path.with_name(input_path.stem + ".opendna.json")
