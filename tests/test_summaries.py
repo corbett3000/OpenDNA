@@ -26,6 +26,32 @@ def test_build_analysis_summary_from_fixture(fixtures_dir: Path) -> None:
     assert "Methylation & Detox" in comt.panels
 
 
+def test_build_analysis_summary_infers_histamine_composite() -> None:
+    panels = load_panels()
+    findings = annotate(
+        analyze(
+            {
+                "rs10156191": "TT",
+                "rs1049742": "CT",
+                "rs1049793": "CG",
+                "rs2052129": "GT",
+                "rs11558538": "CT",
+            },
+            panels,
+            selected_panel_ids={"histamine"},
+        ),
+        load_clinvar(),
+        load_pharmgkb(),
+    )
+    summary = build_analysis_summary(findings, panels)
+    histamine = next(item for item in summary.derived_insights if item.id == "histamine")
+    aoc1 = next(item for item in summary.gene_summaries if item.gene == "AOC1")
+    assert histamine.tier == "risk"
+    assert "histamine composite" in histamine.summary.lower()
+    assert "exploratory genetics" in histamine.summary.lower()
+    assert aoc1.caveat is not None
+
+
 def test_build_analysis_summary_infers_cyp2c19_and_warfarin_composites() -> None:
     panels = load_panels()
     findings = annotate(

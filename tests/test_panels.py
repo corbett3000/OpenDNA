@@ -7,12 +7,13 @@ EXPECTED_PANELS = {
     "athletic",
     "dietary",
     "hfe",
+    "histamine",
     "cognition",
     "sensitivity",
 }
 
 
-def test_all_eight_panels_load() -> None:
+def test_all_nine_panels_load() -> None:
     panels = load_panels()
     assert {p.id for p in panels} == EXPECTED_PANELS
 
@@ -40,9 +41,12 @@ def test_expanded_panels_include_new_high_signal_markers() -> None:
     panels = {p.id: p for p in load_panels()}
     cardio_rsids = {s.rsid for s in panels["cardiovascular"].snps}
     pgx_rsids = {s.rsid for s in panels["pharmacogenomics"].snps}
+    histamine_rsids = {s.rsid for s in panels["histamine"].snps}
     assert "rs6025" in cardio_rsids   # F5 Factor V Leiden
     assert "rs1799963" in cardio_rsids  # F2 prothrombin G20210A
     assert "rs2108622" in pgx_rsids  # CYP4F2 warfarin modifier
+    assert "rs10156191" in histamine_rsids  # AOC1 / DAO
+    assert "rs11558538" in histamine_rsids  # HNMT
 
 
 def test_snp_interpretations_are_indexed_by_genotype() -> None:

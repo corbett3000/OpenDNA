@@ -15,6 +15,10 @@ from opendna.models import (
 _TIER_RANK = {"risk": 3, "warning": 2, "normal": 1, "unknown": 0}
 
 GENE_CAVEATS = {
+    "AOC1": (
+        "DAO genetics are only one piece of histamine tolerance. Food load, alcohol, "
+        "medications, gut inflammation, and mast-cell biology can dominate symptoms."
+    ),
     "APOE": (
         "APOE status here comes from rs429358 + rs7412 only; it does not capture "
         "non-APOE causes of dementia or lipid risk."
@@ -46,6 +50,10 @@ GENE_CAVEATS = {
     "HFE": (
         "These common HFE variants explain many classic hemochromatosis patterns, "
         "but not every cause of iron overload or anemia."
+    ),
+    "HNMT": (
+        "HNMT affects intracellular histamine breakdown, not the full picture of "
+        "dietary histamine handling or mast-cell activation."
     ),
     "MTHFR": (
         "Common MTHFR SNPs do not directly diagnose folate deficiency; "
@@ -399,6 +407,73 @@ def _mthfr_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     )
 
 
+def _histamine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    dao_16 = rsid_map.get("rs10156191")
+    dao_332 = rsid_map.get("rs1049742")
+    dao_664 = rsid_map.get("rs1049793")
+    dao_promoter = rsid_map.get("rs2052129")
+    hnmt = rsid_map.get("rs11558538")
+
+    dao_16_count = _variant_count(dao_16, "T")
+    dao_332_count = _variant_count(dao_332, "T")
+    dao_664_count = _variant_count(dao_664, "G")
+    dao_promoter_count = _variant_count(dao_promoter, "T")
+    hnmt_count = _variant_count(hnmt, "T")
+
+    counts = [
+        count
+        for count in (
+            dao_16_count,
+            dao_332_count,
+            dao_664_count,
+            dao_promoter_count,
+            hnmt_count,
+        )
+        if count is not None
+    ]
+    if not counts:
+        return None
+
+    dao_total = sum(
+        count or 0
+        for count in (dao_16_count, dao_332_count, dao_664_count, dao_promoter_count)
+    )
+    hnmt_total = hnmt_count or 0
+
+    if dao_total == 0 and hnmt_total == 0:
+        tier = "normal"
+        detail = (
+            "Histamine composite: no reduced-clearance alleles were detected in the "
+            "DAO and HNMT markers this file covered."
+        )
+    elif dao_total >= 4 or (dao_total >= 2 and hnmt_total >= 1) or hnmt_total == 2:
+        tier = "risk"
+        detail = (
+            "Histamine composite: multi-hit reduced-clearance pattern across DAO/HNMT "
+            "markers. This is a stronger genetic signal for lower histamine "
+            "breakdown capacity."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "Histamine composite: at least one reduced-clearance DAO/HNMT marker is "
+            "present. This can matter more when symptoms are triggered by alcohol, "
+            "high-histamine foods, gut irritation, or certain medications."
+        )
+
+    detail += (
+        " This is exploratory genetics, not a diagnosis of histamine intolerance "
+        "or mast-cell disease."
+    )
+    return _make_insight(
+        "histamine",
+        "Histamine Composite",
+        detail,
+        tier,
+        _present_findings(dao_16, dao_332, dao_664, dao_promoter, hnmt),
+    )
+
+
 def _build_derived_insights(findings: list[Finding]) -> list[DerivedInsight]:
     rsid_map = {
         finding.rsid: finding
@@ -411,6 +486,7 @@ def _build_derived_insights(findings: list[Finding]) -> list[DerivedInsight]:
         _cyp2c19_insight,
         _warfarin_insight,
         _mthfr_insight,
+        _histamine_insight,
     )
     insights = [insight for builder in builders if (insight := builder(rsid_map)) is not None]
     insights.sort(key=lambda item: (-_TIER_RANK[item.tier], item.title))
