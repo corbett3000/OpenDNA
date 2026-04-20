@@ -15,9 +15,37 @@ from opendna.models import (
 _TIER_RANK = {"risk": 3, "warning": 2, "normal": 1, "unknown": 0}
 
 GENE_CAVEATS = {
+    "AOC1": (
+        "DAO genetics are only one piece of histamine tolerance. Food load, alcohol, "
+        "medications, gut inflammation, and mast-cell biology can dominate symptoms."
+    ),
+    "ABCG2": (
+        "ABCG2 rs2231142 is most useful for rosuvastatin exposure, not the full "
+        "statin-response landscape."
+    ),
     "APOE": (
         "APOE status here comes from rs429358 + rs7412 only; it does not capture "
         "non-APOE causes of dementia or lipid risk."
+    ),
+    "ARMS2": (
+        "This reflects common AMD susceptibility only. Smoking, age, and retinal "
+        "findings still matter far more than genetics alone."
+    ),
+    "CFH": (
+        "This common complement marker can raise AMD predisposition, but it does "
+        "not diagnose existing retinal disease."
+    ),
+    "CHRNA3": (
+        "Nicotine-risk markers reflect reinforcement tendency if smoking begins; "
+        "they are not destiny and they are not a reason to smoke."
+    ),
+    "CHRNA5": (
+        "These are behavior-risk markers for nicotine reinforcement, not a "
+        "diagnosis of addiction and not a reason to start smoking."
+    ),
+    "C3": (
+        "This common complement-pathway marker contributes to AMD predisposition "
+        "only; it does not measure current eye health."
     ),
     "CYP2C19": (
         "This captures the common *2 and *17 markers only; other loss-of-function "
@@ -35,6 +63,18 @@ GENE_CAVEATS = {
         "CYP4F2 contributes modestly to warfarin dose and should be read "
         "alongside CYP2C9 and VKORC1."
     ),
+    "CYP2R1": (
+        "CYP2R1 variants influence vitamin D tendency, but sun exposure, season, "
+        "body size, diet, and supplements usually dominate actual lab values."
+    ),
+    "DHCR7": (
+        "DHCR7 is a common vitamin D GWAS marker, not a diagnosis of vitamin D "
+        "deficiency. Serum 25(OH)D remains the real measurement."
+    ),
+    "DPYD": (
+        "Consumer arrays rarely cover the full DPYD allele set. A normal result "
+        "here does not rule out fluoropyrimidine toxicity risk."
+    ),
     "F2": (
         "This common thrombophilia marker raises baseline clot risk but does not "
         "diagnose an active clotting disorder."
@@ -47,6 +87,10 @@ GENE_CAVEATS = {
         "These common HFE variants explain many classic hemochromatosis patterns, "
         "but not every cause of iron overload or anemia."
     ),
+    "HNMT": (
+        "HNMT affects intracellular histamine breakdown, not the full picture of "
+        "dietary histamine handling or mast-cell activation."
+    ),
     "MTHFR": (
         "Common MTHFR SNPs do not directly diagnose folate deficiency; "
         "homocysteine, B12, folate, and diet still matter."
@@ -58,6 +102,10 @@ GENE_CAVEATS = {
     "TPMT": (
         "This panel captures TPMT *3C only; other TPMT and NUDT15 variants can "
         "still be clinically important."
+    ),
+    "VDR": (
+        "VDR changes signaling sensitivity, not measured serum vitamin D. Labs and "
+        "lifestyle still determine whether someone is actually deficient."
     ),
     "VKORC1": (
         "Warfarin response still depends on age, diet, liver function, "
@@ -360,6 +408,94 @@ def _warfarin_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     )
 
 
+def _statin_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    slco1b1 = rsid_map.get("rs4149056")
+    abcg2 = rsid_map.get("rs2231142")
+    slco1b1_count = _variant_count(slco1b1, "C")
+    abcg2_count = _variant_count(abcg2, "A")
+    if slco1b1_count is None and abcg2_count is None:
+        return None
+
+    slco1b1_count = slco1b1_count or 0
+    abcg2_count = abcg2_count or 0
+    if slco1b1_count == 0 and abcg2_count == 0:
+        tier = "normal"
+        detail = (
+            "Statin composite: no common SLCO1B1 or ABCG2 risk pattern was detected "
+            "in the markers this file covered."
+        )
+    elif slco1b1_count == 2 or (slco1b1_count >= 1 and abcg2_count >= 1):
+        tier = "risk"
+        detail = (
+            "Statin composite: combined transporter risk pattern. Simvastatin "
+            "myopathy risk and rosuvastatin exposure are both more likely to run high."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "Statin composite: a common transporter variant is present. The clearest "
+            "signal is lower tolerance for simvastatin or higher rosuvastatin exposure."
+        )
+
+    return _make_insight(
+        "statin",
+        "Statin Composite",
+        detail,
+        tier,
+        _present_findings(slco1b1, abcg2),
+    )
+
+
+def _dpyd_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    star2a = rsid_map.get("rs3918290")
+    star13 = rsid_map.get("rs55886062")
+    c2846 = rsid_map.get("rs67376798")
+    hapb3 = rsid_map.get("rs56038477")
+
+    star2a_count = _variant_count(star2a, "A")
+    star13_count = _variant_count(star13, "G")
+    c2846_count = _variant_count(c2846, "T")
+    hapb3_count = _variant_count(hapb3, "A")
+    counts = [
+        count
+        for count in (star2a_count, star13_count, c2846_count, hapb3_count)
+        if count is not None
+    ]
+    if not counts:
+        return None
+
+    strong_hits = sum(count or 0 for count in (star2a_count, star13_count, c2846_count))
+    tag_hits = hapb3_count or 0
+    if strong_hits >= 1:
+        tier = "risk"
+        detail = (
+            "DPYD composite: clinically actionable fluoropyrimidine-toxicity variant "
+            "detected. Standard 5-FU or capecitabine dosing can be unsafe without "
+            "formal PGx-guided adjustment."
+        )
+    elif tag_hits >= 1:
+        tier = "warning"
+        detail = (
+            "DPYD composite: HapB3 tag signal present. This can indicate lower DPD "
+            "activity, but clinical confirmation is still warranted because the tag "
+            "SNP is not perfect."
+        )
+    else:
+        tier = "normal"
+        detail = (
+            "DPYD composite: no common fluoropyrimidine-toxicity signal was detected "
+            "in the DPYD markers this file covered."
+        )
+
+    return _make_insight(
+        "dpyd",
+        "DPYD Composite",
+        detail,
+        tier,
+        _present_findings(star2a, star13, c2846, hapb3),
+    )
+
+
 def _mthfr_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     c677t = rsid_map.get("rs1801133")
     a1298c = rsid_map.get("rs1801131")
@@ -399,6 +535,199 @@ def _mthfr_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     )
 
 
+def _histamine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    dao_16 = rsid_map.get("rs10156191")
+    dao_332 = rsid_map.get("rs1049742")
+    dao_664 = rsid_map.get("rs1049793")
+    dao_promoter = rsid_map.get("rs2052129")
+    hnmt = rsid_map.get("rs11558538")
+
+    dao_16_count = _variant_count(dao_16, "T")
+    dao_332_count = _variant_count(dao_332, "T")
+    dao_664_count = _variant_count(dao_664, "G")
+    dao_promoter_count = _variant_count(dao_promoter, "T")
+    hnmt_count = _variant_count(hnmt, "T")
+
+    counts = [
+        count
+        for count in (
+            dao_16_count,
+            dao_332_count,
+            dao_664_count,
+            dao_promoter_count,
+            hnmt_count,
+        )
+        if count is not None
+    ]
+    if not counts:
+        return None
+
+    dao_total = sum(
+        count or 0
+        for count in (dao_16_count, dao_332_count, dao_664_count, dao_promoter_count)
+    )
+    hnmt_total = hnmt_count or 0
+
+    if dao_total == 0 and hnmt_total == 0:
+        tier = "normal"
+        detail = (
+            "Histamine composite: no reduced-clearance alleles were detected in the "
+            "DAO and HNMT markers this file covered."
+        )
+    elif dao_total >= 4 or (dao_total >= 2 and hnmt_total >= 1) or hnmt_total == 2:
+        tier = "risk"
+        detail = (
+            "Histamine composite: multi-hit reduced-clearance pattern across DAO/HNMT "
+            "markers. This is a stronger genetic signal for lower histamine "
+            "breakdown capacity."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "Histamine composite: at least one reduced-clearance DAO/HNMT marker is "
+            "present. This can matter more when symptoms are triggered by alcohol, "
+            "high-histamine foods, gut irritation, or certain medications."
+        )
+
+    detail += (
+        " This is exploratory genetics, not a diagnosis of histamine intolerance "
+        "or mast-cell disease."
+    )
+    return _make_insight(
+        "histamine",
+        "Histamine Composite",
+        detail,
+        tier,
+        _present_findings(dao_16, dao_332, dao_664, dao_promoter, hnmt),
+    )
+
+
+def _amd_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    cfh = rsid_map.get("rs1061170")
+    arms2 = rsid_map.get("rs10490924")
+    c3 = rsid_map.get("rs2230199")
+    cfh_count = _variant_count(cfh, "C")
+    arms2_count = _variant_count(arms2, "T")
+    c3_count = _variant_count(c3, "G")
+    counts = [count for count in (cfh_count, arms2_count, c3_count) if count is not None]
+    if not counts:
+        return None
+
+    total = sum(count or 0 for count in (cfh_count, arms2_count, c3_count))
+    if total == 0:
+        tier = "normal"
+        detail = (
+            "AMD composite: no common high-risk pattern was detected in the AMD "
+            "markers this file covered."
+        )
+    elif (arms2_count or 0) == 2 or total >= 4:
+        tier = "risk"
+        detail = (
+            "AMD composite: stronger common susceptibility pattern across CFH, ARMS2, "
+            "and C3. Smoking avoidance and routine eye care become more important."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "AMD composite: at least one common susceptibility marker is present. "
+            "This is a predisposition signal, not a diagnosis of retinal disease."
+        )
+
+    return _make_insight(
+        "amd",
+        "AMD Composite",
+        detail,
+        tier,
+        _present_findings(cfh, arms2, c3),
+    )
+
+
+def _vitamin_d_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    dhcr7 = rsid_map.get("rs12785878")
+    cyp2r1 = rsid_map.get("rs10741657")
+    vdr = rsid_map.get("rs2228570")
+    dhcr7_count = _variant_count(dhcr7, "G")
+    cyp2r1_count = _variant_count(cyp2r1, "G")
+    vdr_count = _variant_count(vdr, "A")
+    counts = [count for count in (dhcr7_count, cyp2r1_count, vdr_count) if count is not None]
+    if not counts:
+        return None
+
+    total = sum(count or 0 for count in (dhcr7_count, cyp2r1_count, vdr_count))
+    if total == 0:
+        tier = "normal"
+        detail = (
+            "Vitamin D composite: no common low-vitamin-D tendency was detected in "
+            "the markers this file covered."
+        )
+    elif total >= 3:
+        tier = "risk"
+        detail = (
+            "Vitamin D composite: multi-hit tendency toward lower 25(OH)D or less "
+            "efficient signaling. Lab monitoring matters more than guessing."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "Vitamin D composite: at least one common lower-vitamin-D marker is "
+            "present. This can matter more during winter, with low sun exposure, or "
+            "if intake is poor."
+        )
+
+    return _make_insight(
+        "vitamin_d",
+        "Vitamin D Composite",
+        detail,
+        tier,
+        _present_findings(dhcr7, cyp2r1, vdr),
+    )
+
+
+def _nicotine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    chrna5 = rsid_map.get("rs16969968")
+    chrna3 = rsid_map.get("rs1051730")
+    regulatory = rsid_map.get("rs588765")
+    chrna5_count = _variant_count(chrna5, "A")
+    chrna3_count = _variant_count(chrna3, "A")
+    regulatory_count = _variant_count(regulatory, "C")
+    counts = [
+        count
+        for count in (chrna5_count, chrna3_count, regulatory_count)
+        if count is not None
+    ]
+    if not counts:
+        return None
+
+    primary_total = (chrna5_count or 0) + (chrna3_count or 0)
+    regulatory_total = regulatory_count or 0
+    if primary_total == 0 and regulatory_total == 0:
+        tier = "normal"
+        detail = (
+            "Nicotine composite: no common high-risk nicotine-reinforcement pattern "
+            "was detected in the markers this file covered."
+        )
+    elif primary_total >= 3 or (primary_total >= 2 and regulatory_total >= 1):
+        tier = "risk"
+        detail = (
+            "Nicotine composite: stronger common dependence-prone pattern. If "
+            "nicotine use begins, reinforcement and smoking heaviness may run higher."
+        )
+    else:
+        tier = "warning"
+        detail = (
+            "Nicotine composite: at least one common dependence-related marker is "
+            "present. This is a behavioral predisposition, not destiny."
+        )
+
+    return _make_insight(
+        "nicotine",
+        "Nicotine Composite",
+        detail,
+        tier,
+        _present_findings(chrna5, chrna3, regulatory),
+    )
+
+
 def _build_derived_insights(findings: list[Finding]) -> list[DerivedInsight]:
     rsid_map = {
         finding.rsid: finding
@@ -410,7 +739,13 @@ def _build_derived_insights(findings: list[Finding]) -> list[DerivedInsight]:
         _hfe_insight,
         _cyp2c19_insight,
         _warfarin_insight,
+        _statin_insight,
+        _dpyd_insight,
         _mthfr_insight,
+        _histamine_insight,
+        _amd_insight,
+        _vitamin_d_insight,
+        _nicotine_insight,
     )
     insights = [insight for builder in builders if (insight := builder(rsid_map)) is not None]
     insights.sort(key=lambda item: (-_TIER_RANK[item.tier], item.title))

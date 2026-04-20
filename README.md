@@ -6,9 +6,9 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 
-**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 8 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, cognition, stimulant sensitivity), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker genes like APOE, HFE, MTHFR, CYP2C19, and warfarin PGx into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
+**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, histamine DAO/HNMT, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
 
-**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis, OpenDNA sends the filtered *findings* (rsid + gene + genotype + tier + short note; roughly 40–50 lines of structured text) to the provider you chose. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
+**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis, OpenDNA sends the filtered *findings* (rsid + gene + genotype + tier + short note; roughly a few dozen lines of structured text) to the provider you chose. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
 
 ## Sample report
 
@@ -17,7 +17,7 @@
 **[→ View the live sample report](https://raw.githack.com/corbett3000/OpenDNA/main/examples/sample-report.html)** (renders the actual HTML in your browser)
 · [view source](examples/sample-report.html)
 
-The sample was generated from a real 23andMe-style raw DNA file run through the full OpenDNA pipeline (parse → 8 panels → ClinVar + PharmGKB annotation → rule-based render). No personal raw data is embedded — only the interpreted findings.
+The sample was generated from a real 23andMe-style raw DNA file run through the full OpenDNA pipeline (parse → shipped panels → ClinVar + PharmGKB annotation → rule-based render). No personal raw data is embedded — only the interpreted findings.
 
 ---
 
@@ -32,7 +32,7 @@ OpenDNA is an educational and exploratory tool. **It is not a clinical diagnosti
 This is the whole trust claim; read it carefully:
 
 1. **Your raw DNA file never leaves your machine.** Parsing, panel matching, ClinVar + PharmGKB annotation, and the rule-based report all happen on `localhost`. No step in that pipeline touches the network.
-2. **LLM synthesis is opt-in and sends a minimal payload.** If and only if you paste an API key and click Generate, OpenDNA sends the filtered findings (roughly 40–50 lines of structured text — rsid, gene, genotype, tier, note) to the provider you chose. Your raw DNA file is **never** sent.
+2. **LLM synthesis is opt-in and sends a minimal payload.** If and only if you paste an API key and click Generate, OpenDNA sends the filtered findings (roughly a few dozen lines of structured text — rsid, gene, genotype, tier, note) to the provider you chose. Your raw DNA file is **never** sent.
 3. **No telemetry, no accounts, no server-side persistence.** API keys are read from the request, held in memory for one call, then discarded. There is no database.
 4. **The server binds to `127.0.0.1` by default.** Only the machine running it can reach it. `--host 0.0.0.0` requires an explicit flag and prints a warning.
 5. **Browser-local convenience storage is opt-in and bounded.** The web UI can remember your DNA file path, LLM provider, model, and API key in the browser's `localStorage` (scoped to `http://localhost:8787` on that one browser profile). Nothing is written to disk by the server, committed to git, or transmitted anywhere. The **Remember** checkbox controls it; the **Clear saved values** button wipes it instantly.
@@ -86,7 +86,7 @@ opendna --version
 pytest -v                           # (only if you installed [dev])
 ```
 
-Current contributor baseline: `51` tests passing.
+Current contributor baseline: `53` tests passing.
 
 ---
 
@@ -98,7 +98,7 @@ opendna serve
 ```
 
 1. **Paste the absolute path** to your raw DNA file (e.g. `/Users/you/Downloads/genome_yourname.txt`).
-2. **Pick panels** — all 8 are selected by default; uncheck to narrow the scope.
+2. **Pick panels** — all 12 are selected by default; uncheck to narrow the scope.
 3. **(Optional) AI synthesis** — pick Anthropic or OpenAI, pick a model, paste your API key. Leave the provider as *None* for a rule-based report only.
 4. **Click *Generate report*.** Watch the progress bar — you'll see the pipeline advance through validate → parse → analyze → annotate → LLM → render.
 5. **Download** the self-contained HTML or the structured JSON.
@@ -143,10 +143,14 @@ Every finding is tier-scored (`risk` / `warning` / `normal` / `unknown`), annota
 |---|---|---|
 | **Cardiovascular & Longevity** | CAD risk, thrombosis, lifespan | APOE, 9p21, FOXO3, LPA, F5, F2 |
 | **Methylation & Detox** | Folate/B12 cycle | MTHFR, COMT, MTR/MTRR, FUT2, CBS, VDR |
-| **Pharmacogenomics (PGx)** | Drug metabolism | CYP2C19, CYP2C9, VKORC1, CYP4F2, SLCO1B1, TPMT, CYP3A5 |
+| **Pharmacogenomics (PGx)** | Drug metabolism | CYP2C19, CYP2C9, VKORC1, CYP4F2, SLCO1B1, ABCG2, DPYD, TPMT, CYP3A5 |
 | **Athletic Performance & Recovery** | Fiber type, recovery | ACTN3, PPARA, PPARGC1A, COL5A1, IL6 |
 | **Dietary Sensitivity** | Lactose, caffeine, alcohol, omega-3 | LCT, CYP1A2, ALDH2, FADS1, TAS2R38 |
+| **Eye Health & Macular Degeneration** | Common AMD predisposition | CFH, ARMS2, C3 |
 | **Iron Metabolism (HFE)** | Hemochromatosis | C282Y, H63D, S65C |
+| **Histamine Handling** | Exploratory histamine breakdown | AOC1 (DAO), HNMT |
+| **Nicotine Dependence & Smoking Response** | Smoking heaviness, nicotine reinforcement | CHRNA5, CHRNA3 |
+| **Vitamin D & Bone** | Low-25(OH)D tendency, signaling | DHCR7, CYP2R1, VDR |
 | **Cognition & Mood** | Plasticity, dopamine | BDNF, DRD2, OXTR |
 | **Stimulant Sensitivity** | Caffeine/adenosine | ADORA2A, CYP1A2, COMT |
 
@@ -157,6 +161,8 @@ The analyzer automatically handles both **allele-order variations** (`AG` == `GA
 - `Not on chip` means the marker was not present in the source file. It does **not** mean the user has a reassuring genotype there.
 - `No-call` means the vendor included the marker but did not make a confident genotype call.
 - Composite calls are only made where the source file type can support them. OpenDNA still does **not** infer rare variants, structural variants, HLA types, CYP2D6 star alleles, or methylation from array data.
+- The histamine panel is exploratory. It can flag lower-clearance DAO/HNMT patterns, but it does **not** diagnose histamine intolerance, food reactions, or mast-cell disease on its own.
+- The AMD, vitamin D, and nicotine panels are predisposition panels. They do **not** diagnose current eye disease, vitamin D deficiency, or addiction by themselves.
 
 ---
 

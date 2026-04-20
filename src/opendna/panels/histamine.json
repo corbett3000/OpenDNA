@@ -1,0 +1,62 @@
+{
+  "id": "histamine",
+  "name": "Histamine Handling",
+  "description": "Exploratory panel for histamine breakdown via DAO (AOC1) and HNMT. Useful for pattern-spotting, not for diagnosing histamine intolerance or mast-cell disease.",
+  "snps": [
+    {
+      "rsid": "rs10156191",
+      "gene": "AOC1",
+      "variant_name": "DAO Thr16Met",
+      "description": "Coding variant in the DAO enzyme. The T allele has been associated with reduced DAO activity in human association studies.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No reduced-DAO allele at this site."},
+        "CT": {"tier": "warning", "note": "One reduced-DAO allele. Histamine clearance may be a bit less resilient, especially with high histamine load or gut inflammation."},
+        "TT": {"tier": "risk", "note": "Two reduced-DAO alleles at this site. This is a stronger genetic signal for lower DAO-mediated histamine breakdown."}
+      }
+    },
+    {
+      "rsid": "rs1049742",
+      "gene": "AOC1",
+      "variant_name": "DAO Ser332Phe",
+      "description": "DAO coding variant associated with lower enzyme activity in AOC1 deficiency studies.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No reduced-DAO allele at this site."},
+        "CT": {"tier": "warning", "note": "One reduced-DAO allele. On its own this is usually a mild signal, but it matters more when other DAO variants stack up."},
+        "TT": {"tier": "risk", "note": "Two reduced-DAO alleles at this site. Stronger genetic signal for lower DAO function."}
+      }
+    },
+    {
+      "rsid": "rs1049793",
+      "gene": "AOC1",
+      "variant_name": "DAO His664Asp",
+      "description": "DAO coding variant associated with reduced histamine-degrading capacity in AOC1 studies.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No reduced-DAO allele at this site."},
+        "CG": {"tier": "warning", "note": "One reduced-DAO allele. This can contribute to lower histamine tolerance when paired with other DAO variants."},
+        "GG": {"tier": "risk", "note": "Two reduced-DAO alleles at this site. Stronger signal for lower DAO-mediated histamine breakdown."}
+      }
+    },
+    {
+      "rsid": "rs2052129",
+      "gene": "AOC1",
+      "variant_name": "DAO promoter c.-691G>T",
+      "description": "Promoter-region variant associated with lower AOC1 transcription and lower DAO activity.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No lower-expression DAO allele at this site."},
+        "GT": {"tier": "warning", "note": "One lower-expression allele. DAO reserve may be somewhat lower under stressors like alcohol, infection, or gut irritation."},
+        "TT": {"tier": "risk", "note": "Two lower-expression alleles at this site. Stronger signal for reduced DAO expression."}
+      }
+    },
+    {
+      "rsid": "rs11558538",
+      "gene": "HNMT",
+      "variant_name": "HNMT Thr105Ile",
+      "description": "Functional HNMT variant. The T allele lowers histamine N-methyltransferase activity and can reduce intracellular histamine clearance.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Standard HNMT activity at this site."},
+        "CT": {"tier": "warning", "note": "One lower-activity HNMT allele. Histamine breakdown outside the gut may be somewhat slower."},
+        "TT": {"tier": "risk", "note": "Two lower-activity HNMT alleles. Stronger signal for reduced HNMT-mediated histamine breakdown."}
+      }
+    }
+  ]
+}

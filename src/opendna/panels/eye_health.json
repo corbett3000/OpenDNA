@@ -1,0 +1,40 @@
+{
+  "id": "eye_health",
+  "name": "Eye Health & Macular Degeneration",
+  "description": "Common age-related macular degeneration (AMD) susceptibility markers. Best read as predisposition, not diagnosis.",
+  "snps": [
+    {
+      "rsid": "rs1061170",
+      "gene": "CFH",
+      "variant_name": "Y402H",
+      "description": "Complement-factor H variant strongly associated with common AMD risk in European-ancestry studies.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "No common CFH Y402H risk allele detected at this site."},
+        "CT": {"tier": "warning", "note": "One common AMD risk allele is present at CFH. Lifestyle and retinal screening matter more as age advances."},
+        "CC": {"tier": "risk", "note": "Two common CFH risk alleles are present. This is a stronger inherited AMD predisposition signal."}
+      }
+    },
+    {
+      "rsid": "rs10490924",
+      "gene": "ARMS2",
+      "variant_name": "A69S",
+      "description": "One of the best-replicated common AMD variants; smoking amplifies the risk signal.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No common ARMS2 risk allele detected at this site."},
+        "GT": {"tier": "warning", "note": "One common AMD risk allele is present at ARMS2."},
+        "TT": {"tier": "risk", "note": "Two ARMS2 risk alleles are present. This is a strong common susceptibility signal for AMD."}
+      }
+    },
+    {
+      "rsid": "rs2230199",
+      "gene": "C3",
+      "variant_name": "R102G",
+      "description": "Complement C3 variant associated with advanced AMD risk in multiple cohorts.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No common C3 AMD risk allele detected at this site."},
+        "CG": {"tier": "warning", "note": "One C3 risk allele is present. This modestly raises common AMD susceptibility."},
+        "GG": {"tier": "risk", "note": "Two C3 risk alleles are present. This is a stronger complement-pathway AMD signal."}
+      }
+    }
+  ]
+}
