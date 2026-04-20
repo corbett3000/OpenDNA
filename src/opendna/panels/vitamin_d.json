@@ -26,6 +26,17 @@
       }
     },
     {
+      "rsid": "rs2282679",
+      "gene": "GC",
+      "variant_name": "Vitamin D binding-protein marker",
+      "description": "GC variant associated with lower circulating 25-hydroxyvitamin D and lower vitamin D binding-protein levels.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "No common lower-vitamin-D GC risk allele detected at this site."},
+        "TG": {"tier": "warning", "note": "One GC risk allele is present. This can pull average circulating 25(OH)D lower than expected."},
+        "GG": {"tier": "risk", "note": "Two GC risk alleles are present. This is one of the stronger common inherited signals for lower circulating 25(OH)D."}
+      }
+    },
+    {
       "rsid": "rs2228570",
       "gene": "VDR",
       "variant_name": "FokI / receptor sensitivity",

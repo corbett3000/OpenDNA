@@ -99,6 +99,7 @@ def test_build_analysis_summary_infers_amd_vitamin_d_and_nicotine_composites() -
                 "rs2230199": "CG",
                 "rs12785878": "GG",
                 "rs10741657": "AG",
+                "rs2282679": "GG",
                 "rs2228570": "AA",
                 "rs16969968": "AG",
                 "rs1051730": "AG",
@@ -115,6 +116,7 @@ def test_build_analysis_summary_infers_amd_vitamin_d_and_nicotine_composites() -
     vitamin_d = next(item for item in summary.derived_insights if item.id == "vitamin_d")
     nicotine = next(item for item in summary.derived_insights if item.id == "nicotine")
     chrna5 = next(item for item in summary.gene_summaries if item.gene == "CHRNA5")
+    gc = next(item for item in summary.gene_summaries if item.gene == "GC")
     assert amd.tier == "risk"
     assert "predisposition" in amd.summary.lower() or "susceptibility" in amd.summary.lower()
     assert vitamin_d.tier == "risk"
@@ -125,3 +127,34 @@ def test_build_analysis_summary_infers_amd_vitamin_d_and_nicotine_composites() -
         or "dependence-prone" in nicotine.summary.lower()
     )
     assert chrna5.caveat is not None
+    assert gc.caveat is not None
+
+
+def test_build_analysis_summary_infers_alcohol_and_caffeine_composites() -> None:
+    panels = load_panels()
+    findings = annotate(
+        analyze(
+            {
+                "rs671": "AG",
+                "rs1229984": "AG",
+                "rs762551": "AC",
+                "rs5751876": "CT",
+                "rs2472297": "CT",
+            },
+            panels,
+            selected_panel_ids={"dietary", "sensitivity"},
+        ),
+        load_clinvar(),
+        load_pharmgkb(),
+    )
+    summary = build_analysis_summary(findings, panels)
+    alcohol = next(item for item in summary.derived_insights if item.id == "alcohol")
+    caffeine = next(item for item in summary.derived_insights if item.id == "caffeine")
+    aldh2 = next(item for item in summary.gene_summaries if item.gene == "ALDH2")
+    adh1b = next(item for item in summary.gene_summaries if item.gene == "ADH1B")
+    assert alcohol.tier == "risk"
+    assert "acetaldehyde" in alcohol.summary.lower()
+    assert caffeine.tier == "risk"
+    assert "slower cyp1a2 clearance" in caffeine.summary.lower()
+    assert aldh2.caveat is None
+    assert adh1b.caveat is not None

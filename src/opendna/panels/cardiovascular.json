@@ -79,6 +79,17 @@
         "AG": {"tier": "warning", "note": "Carrier — venous thrombosis risk is elevated versus baseline."},
         "AA": {"tier": "risk", "note": "Homozygous carrier — higher clotting-risk signal than heterozygous carriage."}
       }
+    },
+    {
+      "rsid": "rs2200733",
+      "gene": "PITX2",
+      "variant_name": "4q25 atrial fibrillation locus",
+      "description": "Best-replicated common atrial fibrillation susceptibility marker near PITX2; also linked to cardioembolic stroke risk through AF.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No common 4q25 AF risk allele detected at this site."},
+        "CT": {"tier": "warning", "note": "One 4q25 AF risk allele is present. This raises inherited susceptibility to atrial fibrillation compared with baseline."},
+        "TT": {"tier": "risk", "note": "Two 4q25 AF risk alleles are present. This is a stronger common predisposition signal for atrial fibrillation."}
+      }
     }
   ]
 }

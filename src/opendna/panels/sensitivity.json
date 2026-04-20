@@ -1,7 +1,7 @@
 {
   "id": "sensitivity",
   "name": "Stimulant & Adenosine Sensitivity",
-  "description": "Variants controlling how caffeine and adenosine interact with the brain.",
+  "description": "Variants controlling how caffeine is preferred, metabolized, and experienced in the brain.",
   "snps": [
     {
       "rsid": "rs5751876",
@@ -34,6 +34,17 @@
         "GG": {"tier": "warning", "note": "Warrior — dopamine clears fast; stimulants may feel less intense."},
         "AG": {"tier": "normal", "note": "Balanced."},
         "AA": {"tier": "warning", "note": "Worrier — stimulants may feel stronger, potentially more anxiogenic."}
+      }
+    },
+    {
+      "rsid": "rs2472297",
+      "gene": "CYP1A2",
+      "variant_name": "Coffee-consumption tendency",
+      "description": "Intergenic marker near CYP1A1/CYP1A2 associated with slightly higher habitual coffee consumption.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "No common higher-coffee-intake allele detected at this site."},
+        "CT": {"tier": "warning", "note": "One higher-coffee-intake allele is present. Habitual caffeine use may drift a bit higher than baseline."},
+        "TT": {"tier": "warning", "note": "Two higher-coffee-intake alleles are present. This is a stronger common tendency toward higher coffee intake."}
       }
     }
   ]
