@@ -1,0 +1,40 @@
+{
+  "id": "vitamin_d",
+  "name": "Vitamin D & Bone",
+  "description": "Common vitamin D synthesis, activation, and receptor markers. Useful for predisposition only; labs still matter most.",
+  "snps": [
+    {
+      "rsid": "rs12785878",
+      "gene": "DHCR7",
+      "variant_name": "Skin synthesis marker",
+      "description": "GWAS marker near DHCR7/NADSYN1 associated with lower circulating 25-hydroxyvitamin D in some populations.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "No common lower-vitamin-D risk allele detected at this site."},
+        "GT": {"tier": "warning", "note": "One lower-vitamin-D risk allele is present. Sun exposure and season can dominate the actual lab result."},
+        "GG": {"tier": "risk", "note": "Two lower-vitamin-D risk alleles are present. This is a stronger inherited tendency toward lower 25(OH)D."}
+      }
+    },
+    {
+      "rsid": "rs10741657",
+      "gene": "CYP2R1",
+      "variant_name": "25-hydroxylase marker",
+      "description": "CYP2R1 variant associated with baseline vitamin D level and supplementation response.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "No common lower-activity CYP2R1 signal detected at this site."},
+        "AG": {"tier": "warning", "note": "One common CYP2R1 risk allele is present. Some people with this pattern run lower 25(OH)D at baseline."},
+        "GG": {"tier": "risk", "note": "Two common CYP2R1 risk alleles are present. This is a stronger genetic tendency toward lower 25(OH)D."}
+      }
+    },
+    {
+      "rsid": "rs2228570",
+      "gene": "VDR",
+      "variant_name": "FokI / receptor sensitivity",
+      "description": "Common vitamin D receptor variant already used in the methylation panel; repeated here because it fits vitamin D signaling directly.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Common receptor pattern."},
+        "AG": {"tier": "normal", "note": "Intermediate receptor pattern."},
+        "AA": {"tier": "warning", "note": "Lower receptor efficiency — vitamin D signaling may be a bit less resilient."}
+      }
+    }
+  ]
+}

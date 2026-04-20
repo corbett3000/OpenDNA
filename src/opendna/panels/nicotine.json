@@ -1,0 +1,40 @@
+{
+  "id": "nicotine",
+  "name": "Nicotine Dependence & Smoking Response",
+  "description": "Common smoking-heaviness and nicotine-reinforcement markers. Behavioral predisposition only; not deterministic.",
+  "snps": [
+    {
+      "rsid": "rs16969968",
+      "gene": "CHRNA5",
+      "variant_name": "D398N",
+      "description": "The strongest common CHRNA5 smoking-dependence marker in many GWAS; associated with heavier smoking among smokers.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No common CHRNA5 nicotine-risk allele detected at this site."},
+        "AG": {"tier": "warning", "note": "One CHRNA5 risk allele is present. If nicotine use starts, reinforcement can run stronger than baseline."},
+        "AA": {"tier": "risk", "note": "Two CHRNA5 risk alleles are present. This is the strongest common dependence-prone pattern at this site."}
+      }
+    },
+    {
+      "rsid": "rs1051730",
+      "gene": "CHRNA3",
+      "variant_name": "Smoking quantity marker",
+      "description": "Closely related to smoking heaviness and toxin exposure among smokers.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No common CHRNA3 smoking-quantity risk allele detected at this site."},
+        "AG": {"tier": "warning", "note": "One CHRNA3 risk allele is present. This can track with heavier smoking once nicotine use begins."},
+        "AA": {"tier": "risk", "note": "Two CHRNA3 risk alleles are present. This is a stronger common signal for heavier smoking exposure."}
+      }
+    },
+    {
+      "rsid": "rs588765",
+      "gene": "CHRNA5",
+      "variant_name": "Regulatory expression marker",
+      "description": "Expression-linked CHRNA5 marker that refines nicotine-dependence tendency when paired with rs16969968.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "No common rs588765 risk allele detected at this site."},
+        "CT": {"tier": "warning", "note": "One regulatory risk allele is present. This is a smaller signal than rs16969968 but can reinforce it."},
+        "CC": {"tier": "warning", "note": "Two regulatory risk alleles are present. This is a moderate added nicotine-reinforcement signal."}
+      }
+    }
+  ]
+}

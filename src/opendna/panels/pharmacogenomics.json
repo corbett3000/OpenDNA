@@ -81,6 +81,61 @@
       }
     },
     {
+      "rsid": "rs2231142",
+      "gene": "ABCG2",
+      "variant_name": "c.421C>A (Q141K)",
+      "description": "Common BCRP transporter variant. Most relevant for rosuvastatin exposure and complements SLCO1B1 for statin interpretation.",
+      "interpretations": {
+        "CC": {"tier": "normal", "note": "Baseline ABCG2 transporter activity at this site."},
+        "AC": {"tier": "warning", "note": "Decreased transporter function — rosuvastatin exposure can run higher than expected."},
+        "AA": {"tier": "risk", "note": "Poorer ABCG2 transporter function — strongest common signal here for elevated rosuvastatin exposure."}
+      }
+    },
+    {
+      "rsid": "rs3918290",
+      "gene": "DPYD",
+      "variant_name": "*2A splice variant",
+      "description": "Rare but highly actionable fluoropyrimidine toxicity variant for 5-FU and capecitabine.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No DPYD *2A variant detected at this site."},
+        "AG": {"tier": "risk", "note": "Actionable DPYD toxicity variant present — fluoropyrimidines can cause severe toxicity without dose reduction."},
+        "AA": {"tier": "risk", "note": "Two DPYD *2A risk alleles present — extremely high fluoropyrimidine toxicity risk."}
+      }
+    },
+    {
+      "rsid": "rs55886062",
+      "gene": "DPYD",
+      "variant_name": "*13 (c.1679T>G)",
+      "description": "Rare DPYD loss-of-function variant with strong fluoropyrimidine toxicity relevance.",
+      "interpretations": {
+        "TT": {"tier": "normal", "note": "No DPYD *13 variant detected at this site."},
+        "TG": {"tier": "risk", "note": "Actionable DPYD loss-of-function variant present — major fluoropyrimidine dose reduction is typically required."},
+        "GG": {"tier": "risk", "note": "Two DPYD *13 risk alleles present — strongest toxicity signal in this marker set."}
+      }
+    },
+    {
+      "rsid": "rs67376798",
+      "gene": "DPYD",
+      "variant_name": "c.2846A>T",
+      "description": "Clinically actionable DPYD decreased-function variant associated with fluoropyrimidine toxicity.",
+      "interpretations": {
+        "AA": {"tier": "normal", "note": "No DPYD c.2846A>T variant detected at this site."},
+        "AT": {"tier": "risk", "note": "Actionable DPYD toxicity variant present — standard 5-FU or capecitabine doses can be unsafe."},
+        "TT": {"tier": "risk", "note": "Two DPYD c.2846A>T risk alleles present — strongest common toxicity signal at this site."}
+      }
+    },
+    {
+      "rsid": "rs56038477",
+      "gene": "DPYD",
+      "variant_name": "HapB3 tag (c.1236G>A)",
+      "description": "Tag SNP used on some arrays for the DPYD HapB3 decreased-function haplotype. Useful, but not as definitive as directly assaying the causal intronic SNP.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "No common HapB3 tag signal detected at this site."},
+        "AG": {"tier": "warning", "note": "HapB3 tag present — possible DPYD decreased function. Confirm with a clinical PGx assay before treatment decisions."},
+        "AA": {"tier": "risk", "note": "Two HapB3 tag alleles are present. This is a stronger common signal for lower DPD activity, but still benefits from confirmatory testing."}
+      }
+    },
+    {
       "rsid": "rs1142345",
       "gene": "TPMT",
       "variant_name": "*3C",
