@@ -43,13 +43,17 @@ def test_methylation_panel_has_known_snps() -> None:
 def test_expanded_panels_include_new_high_signal_markers() -> None:
     panels = {p.id: p for p in load_panels()}
     cardio_rsids = {s.rsid for s in panels["cardiovascular"].snps}
+    dietary_rsids = {s.rsid for s in panels["dietary"].snps}
     pgx_rsids = {s.rsid for s in panels["pharmacogenomics"].snps}
     eye_rsids = {s.rsid for s in panels["eye_health"].snps}
     histamine_rsids = {s.rsid for s in panels["histamine"].snps}
     nicotine_rsids = {s.rsid for s in panels["nicotine"].snps}
+    sensitivity_rsids = {s.rsid for s in panels["sensitivity"].snps}
     vitamin_d_rsids = {s.rsid for s in panels["vitamin_d"].snps}
     assert "rs6025" in cardio_rsids   # F5 Factor V Leiden
     assert "rs1799963" in cardio_rsids  # F2 prothrombin G20210A
+    assert "rs2200733" in cardio_rsids  # PITX2 / 4q25 AF
+    assert "rs1229984" in dietary_rsids  # ADH1B alcohol oxidation
     assert "rs2108622" in pgx_rsids  # CYP4F2 warfarin modifier
     assert "rs2231142" in pgx_rsids  # ABCG2 statin transporter
     assert "rs3918290" in pgx_rsids  # DPYD *2A
@@ -58,7 +62,9 @@ def test_expanded_panels_include_new_high_signal_markers() -> None:
     assert "rs10156191" in histamine_rsids  # AOC1 / DAO
     assert "rs11558538" in histamine_rsids  # HNMT
     assert "rs16969968" in nicotine_rsids  # CHRNA5
+    assert "rs2472297" in sensitivity_rsids  # coffee-consumption tendency
     assert "rs12785878" in vitamin_d_rsids  # DHCR7
+    assert "rs2282679" in vitamin_d_rsids  # GC vitamin D binding protein
 
 
 def test_snp_interpretations_are_indexed_by_genotype() -> None:

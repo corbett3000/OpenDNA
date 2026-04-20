@@ -15,6 +15,14 @@ from opendna.models import (
 _TIER_RANK = {"risk": 3, "warning": 2, "normal": 1, "unknown": 0}
 
 GENE_CAVEATS = {
+    "ADH1B": (
+        "ADH1B changes how fast ethanol is converted to acetaldehyde. Intake pattern, "
+        "ALDH2 status, and real-world drinking still matter more than this marker alone."
+    ),
+    "ADORA2A": (
+        "ADORA2A is about caffeine sensitivity, not caffeine metabolism. The same dose "
+        "can feel very different depending on sleep debt and total intake."
+    ),
     "AOC1": (
         "DAO genetics are only one piece of histamine tolerance. Food load, alcohol, "
         "medications, gut inflammation, and mast-cell biology can dominate symptoms."
@@ -46,6 +54,10 @@ GENE_CAVEATS = {
     "C3": (
         "This common complement-pathway marker contributes to AMD predisposition "
         "only; it does not measure current eye health."
+    ),
+    "CYP1A2": (
+        "CYP1A2-related markers affect caffeine handling and intake tendency, but "
+        "actual tolerance still depends heavily on dose, timing, sleep, and smoking."
     ),
     "CYP2C19": (
         "This captures the common *2 and *17 markers only; other loss-of-function "
@@ -83,6 +95,10 @@ GENE_CAVEATS = {
         "This array marker flags inherited thrombophilia risk, not current clotting "
         "status or treatment need."
     ),
+    "GC": (
+        "GC influences vitamin D binding and circulating levels, but serum 25(OH)D "
+        "testing still matters far more than genetics for clinical decisions."
+    ),
     "HFE": (
         "These common HFE variants explain many classic hemochromatosis patterns, "
         "but not every cause of iron overload or anemia."
@@ -94,6 +110,10 @@ GENE_CAVEATS = {
     "MTHFR": (
         "Common MTHFR SNPs do not directly diagnose folate deficiency; "
         "homocysteine, B12, folate, and diet still matter."
+    ),
+    "PITX2": (
+        "This is a common predisposition marker for atrial fibrillation, not evidence "
+        "that an arrhythmia is currently present."
     ),
     "SLCO1B1": (
         "rs4149056 captures the best-known simvastatin myopathy signal, not the "
@@ -535,6 +555,58 @@ def _mthfr_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     )
 
 
+def _alcohol_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    aldh2 = rsid_map.get("rs671")
+    adh1b = rsid_map.get("rs1229984")
+    aldh2_count = _variant_count(aldh2, "A")
+    adh1b_count = _variant_count(adh1b, "A")
+    if aldh2_count is None and adh1b_count is None:
+        return None
+
+    aldh2_count = aldh2_count or 0
+    adh1b_count = adh1b_count or 0
+    if aldh2_count >= 1 and adh1b_count >= 1:
+        tier = "risk"
+        detail = (
+            "Alcohol composite: faster ADH1B oxidation plus reduced ALDH2 clearance. "
+            "Alcohol is more likely to produce rapid acetaldehyde buildup, flushing, "
+            "and stronger adverse effects."
+        )
+    elif aldh2_count == 2:
+        tier = "risk"
+        detail = (
+            "Alcohol composite: strongest common ALDH2-related flush pattern. Even "
+            "modest alcohol exposure can produce marked acetaldehyde symptoms."
+        )
+    elif aldh2_count == 1:
+        tier = "warning"
+        detail = (
+            "Alcohol composite: one reduced-clearance ALDH2 allele is present. "
+            "Flushing and acetaldehyde-related symptoms are more likely than baseline."
+        )
+    elif adh1b_count >= 1:
+        tier = "normal"
+        detail = (
+            "Alcohol composite: faster ADH1B pattern without reduced ALDH2. This often "
+            "makes heavy drinking less rewarding, but it does not protect against the "
+            "health effects of alcohol."
+        )
+    else:
+        tier = "normal"
+        detail = (
+            "Alcohol composite: no common high-acetaldehyde pattern was detected in "
+            "the markers this file covered."
+        )
+
+    return _make_insight(
+        "alcohol",
+        "Alcohol Handling Composite",
+        detail,
+        tier,
+        _present_findings(aldh2, adh1b),
+    )
+
+
 def _histamine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     dao_16 = rsid_map.get("rs10156191")
     dao_332 = rsid_map.get("rs1049742")
@@ -602,6 +674,62 @@ def _histamine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     )
 
 
+def _caffeine_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
+    metabolism = rsid_map.get("rs762551")
+    anxiety = rsid_map.get("rs5751876")
+    intake = rsid_map.get("rs2472297")
+    slow_count = _variant_count(metabolism, "C")
+    anxiety_count = _variant_count(anxiety, "T")
+    intake_count = _variant_count(intake, "T")
+    counts = [count for count in (slow_count, anxiety_count, intake_count) if count is not None]
+    if not counts:
+        return None
+
+    slow_count = slow_count or 0
+    anxiety_count = anxiety_count or 0
+    intake_count = intake_count or 0
+    if slow_count >= 1 and anxiety_count >= 1:
+        tier = "risk"
+        detail = (
+            "Caffeine composite: slower CYP1A2 clearance and higher ADORA2A anxiety "
+            "sensitivity are both present. Large doses are more likely to feel bad and "
+            "linger longer."
+        )
+    elif (slow_count >= 1 and intake_count >= 1) or (anxiety_count >= 1 and intake_count >= 1):
+        tier = "warning"
+        detail = (
+            "Caffeine composite: a higher-intake tendency overlaps with either slower "
+            "clearance or higher anxiety sensitivity. Overconsuming caffeine is easier "
+            "to do than it may feel in the moment."
+        )
+    elif slow_count >= 1 or anxiety_count >= 1:
+        tier = "warning"
+        detail = (
+            "Caffeine composite: at least one common lower-tolerance marker is present. "
+            "Dose timing and total intake matter more than average."
+        )
+    elif intake_count >= 1:
+        tier = "normal"
+        detail = (
+            "Caffeine composite: higher habitual coffee-intake tendency is present "
+            "without a clear slow-clearance or anxiety-sensitivity signal."
+        )
+    else:
+        tier = "normal"
+        detail = (
+            "Caffeine composite: no common higher-risk caffeine-tolerance pattern was "
+            "detected in the markers this file covered."
+        )
+
+    return _make_insight(
+        "caffeine",
+        "Caffeine Composite",
+        detail,
+        tier,
+        _present_findings(metabolism, anxiety, intake),
+    )
+
+
 def _amd_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     cfh = rsid_map.get("rs1061170")
     arms2 = rsid_map.get("rs10490924")
@@ -645,22 +773,28 @@ def _amd_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
 def _vitamin_d_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
     dhcr7 = rsid_map.get("rs12785878")
     cyp2r1 = rsid_map.get("rs10741657")
+    gc = rsid_map.get("rs2282679")
     vdr = rsid_map.get("rs2228570")
     dhcr7_count = _variant_count(dhcr7, "G")
     cyp2r1_count = _variant_count(cyp2r1, "G")
+    gc_count = _variant_count(gc, "G")
     vdr_count = _variant_count(vdr, "A")
-    counts = [count for count in (dhcr7_count, cyp2r1_count, vdr_count) if count is not None]
+    counts = [
+        count
+        for count in (dhcr7_count, cyp2r1_count, gc_count, vdr_count)
+        if count is not None
+    ]
     if not counts:
         return None
 
-    total = sum(count or 0 for count in (dhcr7_count, cyp2r1_count, vdr_count))
+    total = sum(count or 0 for count in (dhcr7_count, cyp2r1_count, gc_count, vdr_count))
     if total == 0:
         tier = "normal"
         detail = (
             "Vitamin D composite: no common low-vitamin-D tendency was detected in "
             "the markers this file covered."
         )
-    elif total >= 3:
+    elif total >= 4 or (gc_count or 0) >= 2:
         tier = "risk"
         detail = (
             "Vitamin D composite: multi-hit tendency toward lower 25(OH)D or less "
@@ -679,7 +813,7 @@ def _vitamin_d_insight(rsid_map: dict[str, Finding]) -> DerivedInsight | None:
         "Vitamin D Composite",
         detail,
         tier,
-        _present_findings(dhcr7, cyp2r1, vdr),
+        _present_findings(dhcr7, cyp2r1, gc, vdr),
     )
 
 
@@ -742,7 +876,9 @@ def _build_derived_insights(findings: list[Finding]) -> list[DerivedInsight]:
         _statin_insight,
         _dpyd_insight,
         _mthfr_insight,
+        _alcohol_insight,
         _histamine_insight,
+        _caffeine_insight,
         _amd_insight,
         _vitamin_d_insight,
         _nicotine_insight,

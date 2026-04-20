@@ -6,7 +6,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 
-**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, histamine DAO/HNMT, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
+**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, alcohol handling, histamine DAO/HNMT, caffeine tolerance, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
 
 **What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis, OpenDNA sends the filtered *findings* (rsid + gene + genotype + tier + short note; roughly a few dozen lines of structured text) to the provider you chose. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
 
@@ -86,7 +86,7 @@ opendna --version
 pytest -v                           # (only if you installed [dev])
 ```
 
-Current contributor baseline: `53` tests passing.
+Current contributor baseline: `54` tests passing.
 
 ---
 
@@ -141,18 +141,18 @@ Every finding is tier-scored (`risk` / `warning` / `normal` / `unknown`), annota
 
 | Panel | Focus | Representative genes |
 |---|---|---|
-| **Cardiovascular & Longevity** | CAD risk, thrombosis, lifespan | APOE, 9p21, FOXO3, LPA, F5, F2 |
+| **Cardiovascular & Longevity** | CAD risk, thrombosis, lifespan | APOE, 9p21, FOXO3, LPA, F5, F2, PITX2 |
 | **Methylation & Detox** | Folate/B12 cycle | MTHFR, COMT, MTR/MTRR, FUT2, CBS, VDR |
 | **Pharmacogenomics (PGx)** | Drug metabolism | CYP2C19, CYP2C9, VKORC1, CYP4F2, SLCO1B1, ABCG2, DPYD, TPMT, CYP3A5 |
 | **Athletic Performance & Recovery** | Fiber type, recovery | ACTN3, PPARA, PPARGC1A, COL5A1, IL6 |
-| **Dietary Sensitivity** | Lactose, caffeine, alcohol, omega-3 | LCT, CYP1A2, ALDH2, FADS1, TAS2R38 |
+| **Dietary Sensitivity** | Lactose, caffeine, alcohol, omega-3 | LCT, CYP1A2, ALDH2, ADH1B, FADS1, TAS2R38 |
 | **Eye Health & Macular Degeneration** | Common AMD predisposition | CFH, ARMS2, C3 |
 | **Iron Metabolism (HFE)** | Hemochromatosis | C282Y, H63D, S65C |
 | **Histamine Handling** | Exploratory histamine breakdown | AOC1 (DAO), HNMT |
 | **Nicotine Dependence & Smoking Response** | Smoking heaviness, nicotine reinforcement | CHRNA5, CHRNA3 |
-| **Vitamin D & Bone** | Low-25(OH)D tendency, signaling | DHCR7, CYP2R1, VDR |
+| **Vitamin D & Bone** | Low-25(OH)D tendency, signaling | DHCR7, CYP2R1, GC, VDR |
 | **Cognition & Mood** | Plasticity, dopamine | BDNF, DRD2, OXTR |
-| **Stimulant Sensitivity** | Caffeine/adenosine | ADORA2A, CYP1A2, COMT |
+| **Stimulant Sensitivity** | Caffeine/adenosine | ADORA2A, CYP1A2, COMT, rs2472297 |
 
 The analyzer automatically handles both **allele-order variations** (`AG` == `GA`) and **reverse-strand reports** (panel `CC` matches file `GG` for C/T SNPs), so genotypes from any major consumer-testing vendor should resolve correctly.
 
@@ -162,6 +162,7 @@ The analyzer automatically handles both **allele-order variations** (`AG` == `GA
 - `No-call` means the vendor included the marker but did not make a confident genotype call.
 - Composite calls are only made where the source file type can support them. OpenDNA still does **not** infer rare variants, structural variants, HLA types, CYP2D6 star alleles, or methylation from array data.
 - The histamine panel is exploratory. It can flag lower-clearance DAO/HNMT patterns, but it does **not** diagnose histamine intolerance, food reactions, or mast-cell disease on its own.
+- `rs1229984` and `rs2472297` are tendency markers. They can improve alcohol and caffeine context, but they do **not** override actual intake, symptoms, or behavior.
 - The AMD, vitamin D, and nicotine panels are predisposition panels. They do **not** diagnose current eye disease, vitamin D deficiency, or addiction by themselves.
 
 ---

@@ -37,6 +37,17 @@
       }
     },
     {
+      "rsid": "rs1229984",
+      "gene": "ADH1B",
+      "variant_name": "Fast alcohol oxidation",
+      "description": "The A allele encodes a faster ADH1B enzyme that can make alcohol feel more aversive and lower heavy-drinking tendency, especially when paired with ALDH2 variants.",
+      "interpretations": {
+        "GG": {"tier": "normal", "note": "Standard ADH1B alcohol-oxidation pattern."},
+        "AG": {"tier": "warning", "note": "Faster ADH1B pattern — alcohol may feel less rewarding or more unpleasant, and acetaldehyde buildup can feel stronger if ALDH2 is also reduced."},
+        "AA": {"tier": "warning", "note": "Strongest common fast-ADH1B pattern — alcohol is often metabolized to acetaldehyde quickly, which can amplify flushing or aversive effects when ALDH2 is also reduced."}
+      }
+    },
+    {
       "rsid": "rs174537",
       "gene": "FADS1",
       "variant_name": "Omega-3 conversion",
