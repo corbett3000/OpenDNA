@@ -6,9 +6,9 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 
-**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, alcohol handling, histamine DAO/HNMT, caffeine tolerance, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer.
+**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, alcohol handling, histamine DAO/HNMT, caffeine tolerance, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer and report Q&A.
 
-**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis, OpenDNA sends the filtered *findings* (rsid + gene + genotype + tier + short note; roughly a few dozen lines of structured text) to the provider you chose. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
+**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis or report chat, OpenDNA sends filtered report context to the provider you chose: the called findings (panel id + rsid + gene + genotype + tier + short note, plus compact ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and any question you ask. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
 
 ## Sample report
 
@@ -17,7 +17,7 @@
 **[→ View the live sample report](https://raw.githack.com/corbett3000/OpenDNA/main/examples/sample-report.html)** (renders the actual HTML in your browser)
 · [view source](examples/sample-report.html)
 
-The sample was generated from a real 23andMe-style raw DNA file run through the full OpenDNA pipeline (parse → shipped panels → ClinVar + PharmGKB annotation → rule-based render). No personal raw data is embedded — only the interpreted findings.
+The sample was generated from a 23andMe-style raw DNA fixture run through the full OpenDNA pipeline (parse → shipped panels → ClinVar + PharmGKB annotation → rule-based render). No personal raw data is embedded — only the interpreted findings.
 
 ---
 
@@ -32,10 +32,10 @@ OpenDNA is an educational and exploratory tool. **It is not a clinical diagnosti
 This is the whole trust claim; read it carefully:
 
 1. **Your raw DNA file never leaves your machine.** Parsing, panel matching, ClinVar + PharmGKB annotation, and the rule-based report all happen on `localhost`. No step in that pipeline touches the network.
-2. **LLM synthesis is opt-in and sends a minimal payload.** If and only if you paste an API key and click Generate, OpenDNA sends the filtered findings (roughly a few dozen lines of structured text — rsid, gene, genotype, tier, note) to the provider you chose. Your raw DNA file is **never** sent.
+2. **LLM synthesis and report chat are opt-in and send a minimal payload.** If and only if you paste an API key and click Generate or ask a report question, OpenDNA sends filtered report context to the provider you chose: called findings (panel id, rsid, gene, genotype, tier, note, and relevant ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and your question when using report chat. Your raw DNA file is **never** sent.
 3. **No telemetry, no accounts, no server-side persistence.** API keys are read from the request, held in memory for one call, then discarded. There is no database.
 4. **The server binds to `127.0.0.1` by default.** Only the machine running it can reach it. `--host 0.0.0.0` requires an explicit flag and prints a warning.
-5. **Browser-local convenience storage is opt-in and bounded.** The web UI can remember your DNA file path, LLM provider, model, and API key in the browser's `localStorage` (scoped to `http://localhost:8787` on that one browser profile). Nothing is written to disk by the server, committed to git, or transmitted anywhere. The **Remember** checkbox controls it; the **Clear saved values** button wipes it instantly.
+5. **Browser-local convenience storage is opt-in and bounded.** The web UI can remember your DNA file path, LLM provider, model, and API key in the browser's `localStorage` (scoped to the exact app origin, such as `http://127.0.0.1:8787`, in that one browser profile). Nothing is written to disk by the server, committed to git, or transmitted anywhere. The **Remember** checkbox controls it; the **Clear saved values** button wipes it instantly.
 
 ---
 
@@ -101,7 +101,8 @@ opendna serve
 2. **Pick panels** — all 12 are selected by default; uncheck to narrow the scope.
 3. **(Optional) AI synthesis** — pick Anthropic or OpenAI, pick a model, paste your API key. Leave the provider as *None* for a rule-based report only.
 4. **Click *Generate report*.** Watch the progress bar — you'll see the pipeline advance through validate → parse → analyze → annotate → LLM → render.
-5. **Download** the self-contained HTML or the structured JSON.
+5. **Ask follow-up questions** in the report-chat box if you want to query a specific gene, pathway, or blind spot.
+6. **Download** the self-contained HTML or the structured JSON.
 
 ### Default model choices
 
@@ -113,6 +114,18 @@ Override either by typing a different model name into the Model field.
 ### Remembering your settings
 
 Tick the *Remember* checkbox and OpenDNA will store your DNA file path, LLM provider, model, and API key in your browser's `localStorage` so they re-populate on refresh. Click *Clear saved values* any time to wipe them.
+
+---
+
+## Quickstart — native macOS shell
+
+```bash
+./scripts/build_macos_shell.sh --open
+```
+
+This builds `build/macos/OpenDNA.app`, discovers this repo checkout (or lets you choose it), launches `opendna serve` from the repo's `.venv`, and embeds the local UI inside a native SwiftUI shell. The shell adds native macOS commands for choosing a DNA file, restarting the local engine, and opening the current session in your browser.
+
+Privacy note: the shell uses a nonpersistent `WKWebView` data store, so the embedded UI does **not** keep `localStorage` values on disk between app launches. The web app's *Remember* checkbox only lasts for the current shell session there.
 
 ---
 
@@ -131,7 +144,7 @@ opendna scan ~/Downloads/genome.txt --panels pharmacogenomics methylation
 opendna update-db
 ```
 
-The JSON schema is stable and suitable for ingestion by another pipeline stage.
+The JSON payload is versioned (`schema_version`) and suitable for ingestion by another pipeline stage.
 
 ---
 

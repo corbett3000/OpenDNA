@@ -1,9 +1,11 @@
 const $ = (id) => document.getElementById(id);
 let lastReport = null;
+let chatHistory = [];
+const CHAT_HISTORY_LIMIT = 6;
 
 // --- Preference storage (browser-local, never sent over network) ----
-// Values stay in the browser's localStorage for the current origin
-// (http://localhost:8787). They are NOT written to disk by the server,
+// Values stay in the browser's localStorage for the current origin.
+// They are NOT written to disk by the server,
 // committed to git, or transmitted anywhere. Clearing them here is
 // sufficient to remove them.
 const STORAGE_KEY = "opendna:preferences";
@@ -107,6 +109,152 @@ function setStatus(message, isError) {
   status.textContent = message;
 }
 
+function setChatStatus(message, isError) {
+  const status = $("chat-status");
+  status.className = isError ? "status chat-status error" : "status chat-status";
+  status.textContent = message;
+}
+
+// --- Report chat ---------------------------------------------------
+
+function renderChatThread() {
+  const thread = $("chat-thread");
+  thread.replaceChildren();
+
+  if (!chatHistory.length) {
+    const empty = document.createElement("p");
+    empty.className = "chat-empty";
+    empty.textContent = "Ask a question about the current report. Example: What does COMT suggest here?";
+    thread.appendChild(empty);
+    return;
+  }
+
+  for (const message of chatHistory) {
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble " + message.role;
+
+    const role = document.createElement("div");
+    role.className = "chat-role";
+    role.textContent = message.role === "user" ? "You" : "OpenDNA";
+
+    const content = document.createElement("div");
+    content.className = "chat-content";
+    content.textContent = message.content;
+
+    bubble.appendChild(role);
+    bubble.appendChild(content);
+    thread.appendChild(bubble);
+  }
+
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function resetChat(show = false) {
+  chatHistory = [];
+  $("chat-question").value = "";
+  setChatStatus("", false);
+  $("chat-send").disabled = false;
+  if (show) {
+    $("report-chat").classList.remove("hidden");
+    renderChatThread();
+    syncChatAvailability();
+    return;
+  }
+  $("report-chat").classList.add("hidden");
+  $("chat-thread").replaceChildren();
+}
+
+function syncChatAvailability() {
+  const llm = llmConfig();
+  const send = $("chat-send");
+  const key = $("llm-key").value.trim();
+
+  if (!lastReport) {
+    send.disabled = true;
+    setChatStatus("Generate a report before using report chat.", true);
+    return;
+  }
+  if (!llm) {
+    send.disabled = true;
+    setChatStatus("Choose Anthropic or OpenAI above to enable report chat.", true);
+    return;
+  }
+  if (!key) {
+    send.disabled = true;
+    setChatStatus("Paste an API key above to enable report chat.", true);
+    return;
+  }
+
+  send.disabled = false;
+  setChatStatus("Report chat is ready.", false);
+}
+
+async function askReportChat() {
+  if (!lastReport) {
+    setStatus("Generate a report before using report chat.", true);
+    setChatStatus("Generate a report before using report chat.", true);
+    return;
+  }
+
+  const question = $("chat-question").value.trim();
+  if (!question) {
+    setStatus("Enter a question about the current report.", true);
+    setChatStatus("Enter a question about the current report.", true);
+    return;
+  }
+
+  const llm = llmConfig();
+  if (!llm) {
+    setStatus("Choose Anthropic or OpenAI to use report chat.", true);
+    setChatStatus("Choose Anthropic or OpenAI above to use report chat.", true);
+    return;
+  }
+  if (!llm.api_key.trim()) {
+    setStatus("Paste an API key to use report chat.", true);
+    setChatStatus("Paste an API key above to use report chat.", true);
+    return;
+  }
+
+  const btn = $("chat-send");
+  btn.disabled = true;
+
+  try {
+    saveStoredPrefs();
+    setStatus("Asking the report chat assistant...", false);
+    setChatStatus("Submitting question...", false);
+
+    const resp = await fetch("/api/report-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        findings: lastReport.report_json.findings,
+        analysis_summary: lastReport.report_json.analysis_summary,
+        source_file: lastReport.report_json.source_file,
+        history: chatHistory.slice(-CHAT_HISTORY_LIMIT),
+        llm,
+      }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(err.detail || "Report chat failed");
+    }
+
+    const data = await resp.json();
+    chatHistory.push({ role: "user", content: question });
+    chatHistory.push({ role: "assistant", content: data.answer });
+    renderChatThread();
+    $("chat-question").value = "";
+    setStatus("Report chat answered.", false);
+    setChatStatus("Answer ready.", false);
+  } catch (err) {
+    setStatus(err.message, true);
+    setChatStatus(err.message, true);
+  } finally {
+    syncChatAvailability();
+  }
+}
+
 // --- Progress UI --------------------------------------------------
 
 function resetProgress() {
@@ -190,6 +338,9 @@ async function run() {
   _lastLoggedMessage = null;
   resetProgress();
   setStatus("", false);
+  lastReport = null;
+  resetChat(false);
+  $("report-frame").classList.add("hidden");
   btn.disabled = true;
 
   try {
@@ -225,6 +376,7 @@ async function run() {
         };
         $("report-iframe").srcdoc = event.data.report_html;
         $("report-frame").classList.remove("hidden");
+        resetChat(true);
         const n = event.data.report_json.findings_count;
         setStatus("Report ready — " + n + " findings.", false);
         completed = true;
@@ -250,6 +402,22 @@ $("download-json").addEventListener("click", () => {
   if (lastReport) download("opendna-report.json", JSON.stringify(lastReport.report_json, null, 2), "application/json");
 });
 $("clear-saved").addEventListener("click", clearStoredPrefs);
+$("chat-send").addEventListener("click", askReportChat);
+$("chat-clear").addEventListener("click", () => {
+  chatHistory = [];
+  renderChatThread();
+  setStatus("Cleared report chat.", false);
+  setChatStatus("Cleared report chat.", false);
+});
+$("chat-question").addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    askReportChat();
+  }
+});
+$("llm-provider").addEventListener("change", syncChatAvailability);
+$("llm-model").addEventListener("input", syncChatAvailability);
+$("llm-key").addEventListener("input", syncChatAvailability);
 $("remember").addEventListener("change", () => {
   if (!$("remember").checked) {
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
@@ -258,3 +426,4 @@ $("remember").addEventListener("change", () => {
 
 loadStoredPrefs();
 loadPanels();
+syncChatAvailability();

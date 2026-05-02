@@ -1,6 +1,6 @@
 """FastAPI server for OpenDNA.
 
-Endpoints: /, /api/panels, /api/analyze, /api/analyze-stream, /api/update-db.
+Endpoints: /, /api/panels, /api/analyze, /api/analyze-stream, /api/report-chat, /api/update-db.
 """
 from __future__ import annotations
 
@@ -14,12 +14,13 @@ from typing import Any
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from opendna.analyzer import analyze
 from opendna.annotations import annotate, load_clinvar, load_pharmgkb
 from opendna.annotations.updater import refresh
 from opendna.llm import get_provider
+from opendna.models import AnalysisSummary, ChatTurn, Finding, SourceFileInfo
 from opendna.panels import load_panels
 from opendna.parser import parse_source_file
 from opendna.report import render_report
@@ -40,6 +41,15 @@ class AnalyzeRequest(BaseModel):
     file_path: str
     selected_panels: list[str] | None = None
     llm: LLMConfig | None = None
+
+
+class ReportChatRequest(BaseModel):
+    question: str
+    findings: list[Finding]
+    analysis_summary: AnalysisSummary | None = None
+    source_file: SourceFileInfo | None = None
+    history: list[ChatTurn] = Field(default_factory=list)
+    llm: LLMConfig
 
 
 _static_dir = Path(str(files("opendna.web").joinpath("static")))
@@ -196,6 +206,31 @@ def analyze_stream_endpoint(req: AnalyzeRequest) -> StreamingResponse:
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.post("/api/report-chat")
+def report_chat_endpoint(req: ReportChatRequest) -> JSONResponse:
+    question = req.question.strip()
+    if not question:
+        raise HTTPException(status_code=400, detail="Enter a question about the current report.")
+    if not req.findings:
+        raise HTTPException(status_code=400, detail="Generate a report before using report chat.")
+
+    logger.info("Invoking report chat provider=%s model=%s", req.llm.provider, req.llm.model)
+    try:
+        provider = get_provider(req.llm.provider, api_key=req.llm.api_key, model=req.llm.model)
+        answer = provider.answer_question(
+            req.findings,
+            question=question,
+            analysis_summary=req.analysis_summary,
+            source_file=req.source_file,
+            history=req.history,
+        )
+    except Exception as exc:
+        logger.exception("Report chat failed")
+        raise HTTPException(status_code=502, detail=f"LLM provider error: {exc}") from exc
+
+    return JSONResponse({"answer": answer})
 
 
 @app.post("/api/update-db")

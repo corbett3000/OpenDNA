@@ -54,8 +54,10 @@ def _sample_findings() -> list[Finding]:
 def test_render_report_produces_html_and_json() -> None:
     bundle = render_report(_sample_findings())
     assert "<!DOCTYPE html>" in bundle.html
+    assert "fonts.googleapis.com" not in bundle.html
     assert "MTHFR" in bundle.html
     assert "TPMT" in bundle.html
+    assert bundle.json_payload["schema_version"] == 1
     assert bundle.json_payload["findings_count"] == 2
 
 
@@ -68,6 +70,7 @@ def test_report_html_includes_tier_badges() -> None:
 def test_report_json_is_serializable_and_round_trips() -> None:
     bundle = render_report(_sample_findings())
     roundtrip = json.loads(json.dumps(bundle.json_payload))
+    assert roundtrip["schema_version"] == 1
     assert roundtrip["findings_count"] == 2
     assert roundtrip["findings"][0]["rsid"] == "rs1801133"
 

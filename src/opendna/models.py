@@ -124,6 +124,11 @@ class AnalysisSummary(BaseModel):
     gene_summaries: list[GeneSummary] = Field(default_factory=list)
 
 
+class ChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=2000)
+
+
 class ReportBundle(BaseModel):
     findings: list[Finding]
     html: str

@@ -64,6 +64,32 @@
       </div>
       <iframe id="report-iframe" title="OpenDNA report" sandbox="allow-same-origin"></iframe>
     </section>
+
+    <section id="report-chat" class="card chat hidden">
+      <div class="chat-head">
+        <div>
+          <h2>4. Ask about this report</h2>
+          <p class="chat-note">
+            Uses your current provider, model, and API key. Sends only filtered report findings,
+            coverage context, and your question.
+          </p>
+        </div>
+      </div>
+      <div id="chat-thread" class="chat-thread" aria-live="polite"></div>
+      <label>Question about this report:
+        <textarea
+          id="chat-question"
+          rows="6"
+          placeholder="Ask about COMT, caffeine, histamine, APOE, or what was not tested."
+          spellcheck="true"
+        ></textarea>
+      </label>
+      <div id="chat-status" class="status chat-status"></div>
+      <div class="chat-actions">
+        <button id="chat-send" type="button" class="primary">Ask report chat</button>
+        <button id="chat-clear" type="button" class="secondary">Clear chat</button>
+      </div>
+    </section>
   </main>
   <script src="/static/app.js"></script>
 </body>

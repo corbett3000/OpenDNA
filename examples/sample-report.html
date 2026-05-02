@@ -4,26 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenDNA Report</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #FFD700;
-      --risk: #FF4D4D;
-      --warning: #FFB300;
-      --success: #00E676;
-      --unknown: #666;
-      --bg: #0A0A0A;
-      --card-bg: #1A1A1A;
-      --card-item: rgba(255,255,255,0.03);
-      --text: #F0F0F0;
-      --text-dim: #A0A0A0;
+      --primary: #ffd700;
+      --risk: #ff4d4d;
+      --warning: #ffb300;
+      --success: #00e676;
+      --unknown: #7d8593;
+      --bg: #0a0a0a;
+      --card-bg: #171717;
+      --card-item: rgba(255,255,255,0.04);
+      --text: #f0f0f0;
+      --text-dim: #a0a0a0;
       --border: #333;
+      --info: #7cc7ff;
     }
     * { box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; line-height: 1.6; }
-    .container { max-width: 960px; margin: 0 auto; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; line-height: 1.6; }
+    .container { max-width: 1040px; margin: 0 auto; }
     header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 32px; gap: 20px; flex-wrap: wrap; }
-    h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: -1px; }
+    h1 { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 2.5rem; font-weight: 800; margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: -1px; }
     .tagline { color: var(--text-dim); margin: 4px 0 0; font-size: 0.95rem; }
     .meta { text-align: right; color: var(--text-dim); font-size: 0.85rem; }
     .meta .big { color: var(--text); font-size: 1.05rem; font-weight: 600; margin: 2px 0; }
@@ -31,71 +31,97 @@
     .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
     @media (max-width: 560px) { .summary-row { grid-template-columns: repeat(2, 1fr); } }
     .stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-    .stat .num { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
+    .stat .num { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; }
     .stat .lbl { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .stat .sub { font-size: 0.72rem; color: var(--text-dim); margin-top: 6px; }
     .stat.risk .num { color: var(--risk); }
     .stat.warning .num { color: var(--warning); }
     .stat.normal .num { color: var(--success); }
     .stat.unknown .num { color: var(--unknown); }
 
+    .section { margin-bottom: 28px; background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .section > h2 { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 1.35rem; font-weight: 600; margin: 0 0 20px; padding-bottom: 10px; color: var(--primary); border-bottom: 1px solid var(--border); }
+    .section-intro { margin: -6px 0 18px; color: var(--text-dim); font-size: 0.92rem; }
+
+    .info-grid, .grid, .derived-grid, .coverage-grid, .gene-grid { display: grid; gap: 16px; }
+    .info-grid { grid-template-columns: repeat(4, 1fr); }
+    .coverage-grid { grid-template-columns: repeat(2, 1fr); }
+    .derived-grid, .gene-grid, .grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) { .info-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 720px) { .coverage-grid, .derived-grid, .gene-grid, .grid { grid-template-columns: 1fr; } }
+
+    .info-card, .coverage-card, .derived-card, .gene-card, .card {
+      background: var(--card-item);
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .info-card .eyebrow, .coverage-card .eyebrow, .card .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .info-card .value, .coverage-card .value, .derived-card .value, .gene-card .value {
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .muted { color: var(--text-dim); }
+    .small { font-size: 0.85rem; color: var(--text-dim); }
+    .list { margin: 0; padding-left: 20px; color: var(--text-dim); }
+    .list li + li { margin-top: 8px; }
+
     .critical-alert { background: rgba(255,77,77,0.08); border: 2px solid var(--risk); padding: 20px 24px; border-radius: 12px; margin-bottom: 28px; }
-    .critical-alert h3 { font-family: 'Outfit', sans-serif; margin: 0 0 14px; color: var(--risk); text-transform: uppercase; font-size: 1.05rem; letter-spacing: 1px; }
+    .critical-alert h3 { font-family: "Avenir Next", "Segoe UI", sans-serif; margin: 0 0 14px; color: var(--risk); text-transform: uppercase; font-size: 1.05rem; letter-spacing: 1px; }
     .critical-alert .item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,77,77,0.25); font-size: 0.95rem; }
     .critical-alert .item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
-    .critical-alert strong { color: var(--text); }
-    .critical-alert em { color: var(--text-dim); font-style: italic; }
 
     .ai-synthesis { background: rgba(255,215,0,0.06); border: 1px solid var(--primary); border-radius: 16px; padding: 28px; margin-bottom: 32px; }
-    .ai-synthesis h2 { font-family: 'Outfit', sans-serif; margin: 0 0 16px; color: var(--primary); font-size: 1.35rem; font-weight: 600; }
-    .ai-synthesis pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Inter', sans-serif; margin: 0; line-height: 1.7; font-size: 0.95rem; }
+    .ai-synthesis h2 { font-family: "Avenir Next", "Segoe UI", sans-serif; margin: 0 0 16px; color: var(--primary); font-size: 1.35rem; font-weight: 600; }
+    .ai-synthesis pre { white-space: pre-wrap; word-wrap: break-word; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; line-height: 1.7; font-size: 0.95rem; }
 
-    .section { margin-bottom: 28px; background: var(--card-bg); padding: 28px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-    .section > h2 { font-family: 'Outfit', sans-serif; font-size: 1.35rem; font-weight: 600; margin: 0 0 20px; padding-bottom: 10px; color: var(--primary); border-bottom: 1px solid var(--border); }
+    .badge-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .risk .badge { background: var(--risk); color: var(--bg); }
+    .warning .badge { background: var(--warning); color: var(--bg); }
+    .normal .badge { background: var(--success); color: var(--bg); }
+    .unknown .badge { background: var(--unknown); color: var(--text); }
+    .badge.info { background: rgba(124,199,255,0.18); color: var(--info); }
 
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .card { border-left: 4px solid var(--border); display: flex; flex-direction: column; }
+    .card.risk, .derived-card.risk, .gene-card.risk { border-left: 4px solid var(--risk); }
+    .card.warning, .derived-card.warning, .gene-card.warning { border-left: 4px solid var(--warning); }
+    .card.normal, .derived-card.normal, .gene-card.normal { border-left: 4px solid var(--success); }
+    .card.unknown, .derived-card.unknown, .gene-card.unknown { border-left: 4px solid var(--unknown); }
 
-    .card { background: var(--card-item); padding: 16px 18px; border-radius: 12px; border-left: 4px solid var(--border); display: flex; flex-direction: column; }
-    .card.risk { border-left-color: var(--risk); }
-    .card.warning { border-left-color: var(--warning); }
-    .card.normal { border-left-color: var(--success); }
-    .card.unknown { border-left-color: var(--unknown); opacity: 0.55; }
-    .card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-    .label { font-size: 0.72rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
-    .card.risk .badge { background: var(--risk); color: var(--bg); }
-    .card.warning .badge { background: var(--warning); color: var(--bg); }
-    .card.normal .badge { background: var(--success); color: var(--bg); }
-    .card.unknown .badge { background: var(--unknown); color: var(--text); }
-    .value { font-family: 'SF Mono', 'Menlo', Consolas, monospace; color: var(--text); font-size: 0.95rem; margin: 8px 0 10px; }
-    .value .gene { color: var(--primary); font-weight: 700; }
-    .desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
-    .annot { font-size: 0.78rem; color: var(--text-dim); margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
-    .annot-row { margin-bottom: 4px; }
-    .annot-row:last-child { margin-bottom: 0; }
-    .annot strong { color: var(--primary); font-weight: 600; }
+    .derived-card h3, .gene-card h3 { margin: 0 0 8px; font-size: 1rem; color: var(--text); }
+    .derived-card p, .gene-card p, .card .desc { margin: 0; font-size: 0.9rem; color: var(--text-dim); line-height: 1.55; }
+    .derived-meta, .gene-meta, .finding-meta { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.78rem; color: var(--text-dim); }
+    .finding-meta .row, .derived-meta .row, .gene-meta .row { margin-bottom: 4px; }
+    .finding-meta .row:last-child, .derived-meta .row:last-child, .gene-meta .row:last-child { margin-bottom: 0; }
+    .finding-meta strong, .derived-meta strong, .gene-meta strong { color: var(--primary); font-weight: 600; }
+
+    .card .value { font-family: 'SF Mono', 'Menlo', Consolas, monospace; color: var(--text); font-size: 0.95rem; margin: 0 0 10px; }
+    .confidence { color: var(--info); }
+    .caveat { color: #e7d6a8; }
 
     footer { text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
     footer a { color: var(--primary); text-decoration: none; }
 
     @media print {
       body { background: white; color: black; padding: 0; }
-      .section, .stat, .ai-synthesis, .critical-alert { background: white; border: 1px solid #ccc; box-shadow: none; page-break-inside: avoid; }
+      .section, .stat, .ai-synthesis, .critical-alert, .info-card, .coverage-card, .derived-card, .gene-card, .card { background: white; border: 1px solid #ccc; box-shadow: none; }
       h1, .section > h2, .ai-synthesis h2, .critical-alert h3 { color: black; }
-      .card { background: #f9f9f9; }
-      .ai-synthesis { background: #fffbe6; }
-      .critical-alert { background: #fff0f0; }
+      .badge.info { color: #004b7a; }
     }
   </style>
 </head>
 <body>
 <div class="container">
-
-  <div style="background: rgba(255,215,0,0.08); border: 1px dashed #FFD700; border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; font-size: 0.88rem; color: #F0F0F0;">
-    <strong style="color: #FFD700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.78rem;">Sample report</strong>
-    <p style="margin: 6px 0 0;">This is a demo OpenDNA report rendered from a 23andMe-style raw DNA file. Every finding below is interpretation data drawn from the project's curated SNP panels + ClinVar + PharmGKB. When you run OpenDNA on your own machine, your raw DNA file is parsed and analyzed entirely offline; only if you opt in to AI synthesis does the tool send the filtered findings (not the raw DNA) to the LLM provider you choose. Full setup + privacy details at <a href="https://github.com/corbett3000/OpenDNA" style="color: #FFD700;">github.com/corbett3000/OpenDNA</a>.</p>
-  </div>
-
   <header>
     <div>
       <h1>OpenDNA Report</h1>
@@ -103,27 +129,87 @@
     </div>
     <div class="meta">
       <div>Generated</div>
-      <div class="big">2026-04-17</div>
-      <div>40 SNPs scanned · 38 with data</div>
+      <div class="big">2026-04-20</div>
+      <div>66 target SNPs · 9 confidently assessed</div>
     </div>
   </header>
 
   <div class="summary-row">
-    <div class="stat risk"><div class="num">4</div><div class="lbl">Risk</div></div>
-    <div class="stat warning"><div class="num">11</div><div class="lbl">Warnings</div></div>
-    <div class="stat normal"><div class="num">23</div><div class="lbl">Normal</div></div>
-    <div class="stat unknown"><div class="num">2</div><div class="lbl">Not in file</div></div>
+    <div class="stat risk">
+      <div class="num">2</div>
+      <div class="lbl">Risk</div>
+    </div>
+    <div class="stat warning">
+      <div class="num">4</div>
+      <div class="lbl">Warnings</div>
+    </div>
+    <div class="stat normal">
+      <div class="num">3</div>
+      <div class="lbl">Normal</div>
+    </div>
+    <div class="stat unknown">
+      <div class="num">57</div>
+      <div class="lbl">Unresolved</div>
+      <div class="sub">not on chip, no-call, ambiguous, or not interpreted</div>
+    </div>
   </div>
 
   
-  <div class="critical-alert">
-    <h3>⚠ Critical findings</h3>
-    
-    <div class="item">
-      <strong>9p21 (rs10757278 GG):</strong>
-      Two risk alleles — elevated CAD risk; focus on LDL particle size + inflammation.
-      
+  <section class="section">
+    <h2>Source File Quality</h2>
+    <p class="section-intro">These checks describe what this raw DNA file can and cannot support. Missing markers should be read as “not assessed,” not as a negative result.</p>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="eyebrow">Vendor</div>
+        <p class="value">23andMe</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">Reference Build</div>
+        <p class="value">GRCh37</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">Unique Rsids</div>
+        <p class="value">11</p>
+      </div>
+      <div class="info-card">
+        <div class="eyebrow">No-Calls / Ambiguous</div>
+        <p class="value">1 / 0</p>
+      </div>
     </div>
+    
+    <div style="margin-top: 18px;">
+      <div class="small" style="margin-bottom: 8px;">QC notes</div>
+      <ul class="list">
+        
+        <li><strong>Warning:</strong> This raw DNA file is unusually small. Treat absent markers very cautiously; the file may be truncated or heavily filtered.</li>
+        
+        <li><strong>Info:</strong> 1 markers were present in the file but had no confident genotype call.</li>
+        
+      </ul>
+    </div>
+    
+    
+    <div style="margin-top: 18px;">
+      <div class="small" style="margin-bottom: 8px;">Known blind spots for this file type</div>
+      <ul class="list">
+        
+        <li>Consumer array files only assay a tiny fraction of the genome, so normal here never rules out other variants in the same gene.</li>
+        
+        <li>This file type does not support rare-variant calling, structural variants, methylation, HLA typing, or most CYP2D6 star-allele inference.</li>
+        
+        <li>Chip versions vary, so absent markers often reflect array design rather than a true negative result.</li>
+        
+        <li>This file is good for common SNPs but still misses rare variants, structural variants, and most CYP2D6/HLA haplotypes.</li>
+        
+      </ul>
+    </div>
+    
+  </section>
+  
+
+  
+  <div class="critical-alert">
+    <h3>Critical Findings</h3>
     
     <div class="item">
       <strong>BDNF (rs6265 TT):</strong>
@@ -132,18 +218,17 @@
     </div>
     
     <div class="item">
-      <strong>CYP2C9 (rs1057910 AC):</strong>
-      Intermediate — significant dose reduction often needed.
-      
-      <em>Drug considerations: warfarin.</em>
-      
-    </div>
-    
-    <div class="item">
       <strong>TPMT (rs1142345 TT):</strong>
       Poor metabolizer — standard thiopurine doses can cause fatal myelosuppression. Requires dose reduction or alternative therapy.
       
-      <em>Drug considerations: azathioprine, mercaptopurine, thioguanine.</em>
+      Drug considerations:
+      
+      azathioprine, 
+      
+      mercaptopurine, 
+      
+      thioguanine
+      .
       
     </div>
     
@@ -151,166 +236,384 @@
   
 
   
+  <section class="section">
+    <h2>Composite Calls</h2>
+    <p class="section-intro">These combine multiple source-file markers into a single interpretation, which is usually more useful than reading each rsid in isolation.</p>
+    <div class="derived-grid">
+      
+      <div class="derived-card warning">
+        <div class="badge-row">
+          <h3>MTHFR Composite</h3>
+          <span class="badge">warning</span>
+        </div>
+        <p>MTHFR composite: likely compound heterozygous C677T/A1298C pattern, which can matter more than either single heterozygous call alone.</p>
+        <div class="derived-meta">
+          <div class="row"><strong>Genes:</strong> MTHFR</div>
+          <div class="row"><strong>Inputs:</strong> rs1801131, rs1801133</div>
+          <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high</div>
+        </div>
+      </div>
+      
+      <div class="derived-card normal">
+        <div class="badge-row">
+          <h3>APOE Composite</h3>
+          <span class="badge">normal</span>
+        </div>
+        <p>APOE composite: e3/e3. This is the baseline APOE pattern used for most population comparisons.</p>
+        <div class="derived-meta">
+          <div class="row"><strong>Genes:</strong> APOE</div>
+          <div class="row"><strong>Inputs:</strong> rs429358, rs7412</div>
+          <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high</div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
 
   
+  <section class="section">
+    <h2>Panel Coverage</h2>
+    <p class="section-intro">A section is only as good as the markers this file actually covered. These counts separate assessed markers from missing or unusable ones.</p>
+    <div class="coverage-grid">
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Athletic Performance &amp; Recovery</div>
+        <p class="value">1/5</p>
+        <div class="small">assessed · 20%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 4</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 1</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Cardiovascular &amp; Longevity</div>
+        <p class="value">2/8</p>
+        <div class="small">assessed · 25%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 6</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 2</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Cognition &amp; Mood</div>
+        <p class="value">1/3</p>
+        <div class="small">assessed · 33%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 2</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 1 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Dietary Sensitivity &amp; Nutrition</div>
+        <p class="value">0/6</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 6</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Eye Health &amp; Macular Degeneration</div>
+        <p class="value">0/3</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 3</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Iron Metabolism (HFE)</div>
+        <p class="value">0/3</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 3</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Histamine Handling</div>
+        <p class="value">0/5</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 5</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Methylation &amp; Detox</div>
+        <p class="value">3/8</p>
+        <div class="small">assessed · 38%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 5</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 3 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Nicotine Dependence &amp; Smoking Response</div>
+        <p class="value">0/3</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 3</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Pharmacogenomics (PGx)</div>
+        <p class="value">1/14</p>
+        <div class="small">assessed · 7%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 13</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 1 / 0 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Stimulant &amp; Adenosine Sensitivity</div>
+        <p class="value">1/4</p>
+        <div class="small">assessed · 25%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 3</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 1 / 0</div>
+        </div>
+      </div>
+      
+      <div class="coverage-card">
+        <div class="eyebrow">Vitamin D &amp; Bone</div>
+        <p class="value">0/4</p>
+        <div class="small">assessed · 0%</div>
+        <div class="finding-meta">
+          <div class="row"><strong>Not on chip:</strong> 4</div>
+          <div class="row"><strong>No-call:</strong> 0</div>
+          <div class="row"><strong>Ambiguous:</strong> 0</div>
+          <div class="row"><strong>Risk / Warning / Normal:</strong> 0 / 0 / 0</div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+
+  
+  <section class="section">
+    <h2>Cross-Panel Gene View</h2>
+    <p class="section-intro">These roll up duplicate or multi-marker genes so the analysis reads at the gene level, not just the panel level.</p>
+    <div class="gene-grid">
+      
+      <div class="gene-card warning">
+        <div class="badge-row">
+          <h3>COMT</h3>
+          <span class="badge">warning</span>
+        </div>
+        <p>Warrior phenotype — fast dopamine clearance; often higher stress resilience, lower baseline dopamine. Warrior — dopamine clears fast; stimulants may feel less intense.</p>
+        <div class="gene-meta">
+          <div class="row"><strong>Panels:</strong> Methylation &amp; Detox, Stimulant &amp; Adenosine Sensitivity</div>
+          <div class="row"><strong>Rsids:</strong> rs4680</div>
+          
+        </div>
+      </div>
+      
+      <div class="gene-card warning">
+        <div class="badge-row">
+          <h3>MTHFR</h3>
+          <span class="badge">warning</span>
+        </div>
+        <p>MTHFR composite: likely compound heterozygous C677T/A1298C pattern, which can matter more than either single heterozygous call alone.</p>
+        <div class="gene-meta">
+          <div class="row"><strong>Panels:</strong> Methylation &amp; Detox</div>
+          <div class="row"><strong>Rsids:</strong> rs1801131, rs1801133</div>
+          
+          <div class="row caveat"><strong>Boundary:</strong> Common MTHFR SNPs do not directly diagnose folate deficiency; homocysteine, B12, folate, and diet still matter.</div>
+          
+        </div>
+      </div>
+      
+      <div class="gene-card normal">
+        <div class="badge-row">
+          <h3>APOE</h3>
+          <span class="badge">normal</span>
+        </div>
+        <p>APOE composite: e3/e3. This is the baseline APOE pattern used for most population comparisons.</p>
+        <div class="gene-meta">
+          <div class="row"><strong>Panels:</strong> Cardiovascular &amp; Longevity</div>
+          <div class="row"><strong>Rsids:</strong> rs429358, rs7412</div>
+          
+          <div class="row caveat"><strong>Boundary:</strong> APOE status here comes from rs429358 + rs7412 only; it does not capture non-APOE causes of dementia or lipid risk.</div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </section>
+  
+
+  
+
+  
+    
     
     
     <section class="section">
       <h2>Athletic Performance &amp; Recovery</h2>
+      
+      <p class="section-intro">
+        1/5 assessed ·
+        4 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
         <div class="card normal">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">ACTN3</div>
             <span class="badge">normal</span>
           </div>
-          <div class="value"><span class="gene">CT</span> · rs1815739</div>
+          <div class="value">
+            CT · rs1815739
+            
+          </div>
           <div class="desc">RX — mixed profile.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">PPARGC1A</div>
-            <span class="badge">normal</span>
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
+            
+            
+            
           </div>
-          <div class="value"><span class="gene">CT</span> · rs8192678</div>
-          <div class="desc">Intermediate.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">COL5A1</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">TT</span> · rs12722</div>
-          <div class="desc">More compliant tendons.</div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">IL6</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs1800795</div>
-          <div class="desc">Higher inflammatory response — longer recovery windows may help.</div>
-          
         </div>
         
       </div>
     </section>
     
   
+    
     
     
     <section class="section">
       <h2>Cardiovascular &amp; Longevity</h2>
+      
+      <p class="section-intro">
+        2/8 assessed ·
+        6 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
         <div class="card normal">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">APOE</div>
             <span class="badge">normal</span>
           </div>
-          <div class="value"><span class="gene">TT</span> · rs429358</div>
+          <div class="value">
+            TT · rs429358
+            
+          </div>
           <div class="desc">Not e4 at this site.</div>
-          
-          <div class="annot">
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
             
-            <div class="annot-row"><strong>ClinVar:</strong> risk factor — Alzheimer disease; cardiovascular disease</div>
+            <div class="row caveat"><strong>Boundary:</strong> APOE status here comes from rs429358 + rs7412 only; it does not capture non-APOE causes of dementia or lipid risk.</div>
+            
+            
+            <div class="row"><strong>ClinVar:</strong> risk factor — Alzheimer disease; cardiovascular disease</div>
+            <div class="row"><strong>ClinVar review:</strong> reviewed by expert panel · ClinVar 2026-03 snapshot</div>
             
             
           </div>
-          
         </div>
         
         <div class="card normal">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">APOE</div>
             <span class="badge">normal</span>
           </div>
-          <div class="value"><span class="gene">CC</span> · rs7412</div>
+          <div class="value">
+            CC · rs7412
+            
+          </div>
           <div class="desc">Not e2 at this site.</div>
-          
-          <div class="annot">
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
             
-            <div class="annot-row"><strong>ClinVar:</strong> risk factor / protective — Type III hyperlipoproteinemia (homozygous e2)</div>
+            <div class="row caveat"><strong>Boundary:</strong> APOE status here comes from rs429358 + rs7412 only; it does not capture non-APOE causes of dementia or lipid risk.</div>
+            
+            
+            <div class="row"><strong>ClinVar:</strong> risk factor / protective — Type III hyperlipoproteinemia (homozygous e2)</div>
+            <div class="row"><strong>ClinVar review:</strong> reviewed by expert panel · ClinVar 2026-03 snapshot</div>
             
             
           </div>
-          
-        </div>
-        
-        <div class="card risk">
-          <div class="card-header">
-            <div class="label">9p21</div>
-            <span class="badge">risk</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs10757278</div>
-          <div class="desc">Two risk alleles — elevated CAD risk; focus on LDL particle size + inflammation.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">FOXO3</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GT</span> · rs2802292</div>
-          <div class="desc">Protective longevity allele present.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">LPA</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">TT</span> · rs3798220</div>
-          <div class="desc">Not a risk carrier.</div>
-          
         </div>
         
       </div>
     </section>
     
   
+    
     
     
     <section class="section">
       <h2>Cognition &amp; Mood</h2>
+      
+      <p class="section-intro">
+        1/3 assessed ·
+        2 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
         <div class="card risk">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">BDNF</div>
             <span class="badge">risk</span>
           </div>
-          <div class="value"><span class="gene">TT</span> · rs6265</div>
+          <div class="value">
+            TT · rs6265
+            
+          </div>
           <div class="desc">Met/Met — reduced plasticity; aerobic exercise and novel learning particularly important.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">DRD2</div>
-            <span class="badge">normal</span>
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
+            
+            
+            
           </div>
-          <div class="value"><span class="gene">GG</span> · rs1800497</div>
-          <div class="desc">A2/A2 — standard D2 receptor density.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">OXTR</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs53576</div>
-          <div class="desc">Higher reported empathy / prosocial scores.</div>
-          
         </div>
         
       </div>
@@ -319,447 +622,205 @@
   
     
     
-    <section class="section">
-      <h2>Dietary Sensitivity &amp; Nutrition</h2>
-      <div class="grid">
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">LCT</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs4988235</div>
-          <div class="desc">Lactase non-persistent — likely lactose intolerant.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">CYP1A2</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">AA</span> · rs762551</div>
-          <div class="desc">Fast metabolizer — standard caffeine tolerance.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">ALDH2</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs671</div>
-          <div class="desc">Normal alcohol metabolism.</div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">FADS1</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">GT</span> · rs174537</div>
-          <div class="desc">Moderate conversion — marine omega-3 more important.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">TAS2R38</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs713598</div>
-          <div class="desc">Taster — may dislike Brussels sprouts, broccoli.</div>
-          
-        </div>
-        
-      </div>
-    </section>
     
   
     
     
-    <section class="section">
-      <h2>Iron Metabolism (HFE)</h2>
-      <div class="grid">
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">HFE</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs1800562</div>
-          <div class="desc">Non-carrier.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> pathogenic — Hereditary hemochromatosis type 1</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">HFE</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs1799945</div>
-          <div class="desc">Non-carrier.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> risk factor — Hereditary hemochromatosis type 1 (low penetrance)</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">HFE</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">AA</span> · rs1800730</div>
-          <div class="desc">Non-carrier.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> uncertain significance — Hereditary hemochromatosis type 1</div>
-            
-            
-          </div>
-          
-        </div>
-        
-      </div>
-    </section>
     
   
+    
+    
+    
+  
+    
+    
+    
+  
+    
     
     
     <section class="section">
       <h2>Methylation &amp; Detox</h2>
+      
+      <p class="section-intro">
+        3/8 assessed ·
+        5 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
         <div class="card warning">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">MTHFR</div>
             <span class="badge">warning</span>
           </div>
-          <div class="value"><span class="gene">AG</span> · rs1801133</div>
+          <div class="value">
+            CT · rs1801133
+            
+          </div>
           <div class="desc">~30% reduced enzyme activity; monitor homocysteine.</div>
-          
-          <div class="annot">
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
             
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Homocystinuria; MTHFR deficiency</div>
+            <div class="row caveat"><strong>Boundary:</strong> Common MTHFR SNPs do not directly diagnose folate deficiency; homocysteine, B12, folate, and diet still matter.</div>
+            
+            
+            <div class="row"><strong>ClinVar:</strong> drug response — Homocystinuria; MTHFR deficiency</div>
+            <div class="row"><strong>ClinVar review:</strong> reviewed by expert panel · ClinVar 2026-03 snapshot</div>
             
             
           </div>
-          
         </div>
         
         <div class="card warning">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">MTHFR</div>
             <span class="badge">warning</span>
           </div>
-          <div class="value"><span class="gene">GT</span> · rs1801131</div>
-          <div class="desc">Mild reduction; clinically meaningful only when combined with C677T variant.</div>
-          
-          <div class="annot">
+          <div class="value">
+            AC · rs1801131
             
-            <div class="annot-row"><strong>ClinVar:</strong> not provided — MTHFR deficiency (compound heterozygous with C677T)</div>
+          </div>
+          <div class="desc">Mild reduction; clinically meaningful only when combined with C677T variant.</div>
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
+            
+            <div class="row caveat"><strong>Boundary:</strong> Common MTHFR SNPs do not directly diagnose folate deficiency; homocysteine, B12, folate, and diet still matter.</div>
+            
+            
+            <div class="row"><strong>ClinVar:</strong> not provided — MTHFR deficiency (compound heterozygous with C677T)</div>
+            <div class="row"><strong>ClinVar review:</strong> multiple submitters, no conflicts · ClinVar 2026-03 snapshot</div>
             
             
           </div>
-          
         </div>
         
         <div class="card warning">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">COMT</div>
             <span class="badge">warning</span>
           </div>
-          <div class="value"><span class="gene">GG</span> · rs4680</div>
+          <div class="value">
+            GG · rs4680
+            
+          </div>
           <div class="desc">Warrior phenotype — fast dopamine clearance; often higher stress resilience, lower baseline dopamine.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">MTR</div>
-            <span class="badge">normal</span>
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
+            
+            
+            
           </div>
-          <div class="value"><span class="gene">AA</span> · rs1805087</div>
-          <div class="desc">Standard activity.</div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">MTRR</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">AG</span> · rs1801394</div>
-          <div class="desc">Moderate reduction; paired MTR/MTRR variants amplify impact.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">FUT2</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">AA</span> · rs602662</div>
-          <div class="desc">Secretor — standard B12 absorption.</div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">CBS</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs234706</div>
-          <div class="desc">Standard activity.</div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">VDR</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">AA</span> · rs2228570</div>
-          <div class="desc">Lower receptor sensitivity — may benefit from higher vitamin D intake.</div>
-          
         </div>
         
       </div>
     </section>
     
   
+    
+    
+    
+  
+    
     
     
     <section class="section">
       <h2>Pharmacogenomics (PGx)</h2>
+      
+      <p class="section-intro">
+        1/14 assessed ·
+        13 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">CYP2C19</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">GG</span> · rs4244285</div>
-          <div class="desc">Normal metabolizer at this site.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Clopidogrel response; CYP2C19-mediated drug metabolism</div>
-            
-            
-            
-            <div class="annot-row"><strong>Clopidogrel:</strong> Consider alternative antiplatelet agent (prasugrel or ticagrelor) if no contraindication.</div>
-            
-            <div class="annot-row"><strong>Citalopram:</strong> Consider 50% dose reduction or alternative SSRI.</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">CYP2C19</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs12248560</div>
-          <div class="desc">Normal.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — CYP2C19 ultrarapid metabolism</div>
-            
-            
-            
-            <div class="annot-row"><strong>Clopidogrel:</strong> Standard dosing; monitor for bleeding with concurrent PPI use.</div>
-            
-            <div class="annot-row"><strong>Voriconazole:</strong> Subtherapeutic levels likely — consider alternative antifungal.</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">CYP2C9</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs1799853</div>
-          <div class="desc">Normal metabolizer.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Warfarin response; NSAID metabolism</div>
-            
-            
-            
-            <div class="annot-row"><strong>Warfarin:</strong> Use pharmacogenomic-guided dosing algorithm (e.g. warfarindosing.org).</div>
-            
-            <div class="annot-row"><strong>Celecoxib:</strong> Use lowest effective dose; consider 25-50% reduction.</div>
-            
-            
-          </div>
-          
-        </div>
-        
         <div class="card risk">
-          <div class="card-header">
-            <div class="label">CYP2C9</div>
-            <span class="badge">risk</span>
-          </div>
-          <div class="value"><span class="gene">AC</span> · rs1057910</div>
-          <div class="desc">Intermediate — significant dose reduction often needed.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Warfarin response; NSAID metabolism</div>
-            
-            
-            
-            <div class="annot-row"><strong>Warfarin:</strong> Use PGx-guided dosing; *3/*3 requires substantial dose reduction.</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">VKORC1</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">CT</span> · rs9923231</div>
-          <div class="desc">Increased sensitivity — lower starting dose.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Warfarin sensitivity</div>
-            
-            
-            
-            <div class="annot-row"><strong>Warfarin:</strong> Lower initial warfarin dose (pair with CYP2C9 genotype for full algorithm).</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">SLCO1B1</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">TT</span> · rs4149056</div>
-          <div class="desc">Normal.</div>
-          
-          <div class="annot">
-            
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Simvastatin-induced myopathy</div>
-            
-            
-            
-            <div class="annot-row"><strong>Simvastatin:</strong> Avoid simvastatin 80 mg; consider atorvastatin or rosuvastatin.</div>
-            
-            
-          </div>
-          
-        </div>
-        
-        <div class="card risk">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">TPMT</div>
             <span class="badge">risk</span>
           </div>
-          <div class="value"><span class="gene">TT</span> · rs1142345</div>
+          <div class="value">
+            TT · rs1142345
+            
+          </div>
           <div class="desc">Poor metabolizer — standard thiopurine doses can cause fatal myelosuppression. Requires dose reduction or alternative therapy.</div>
-          
-          <div class="annot">
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
             
-            <div class="annot-row"><strong>ClinVar:</strong> drug response — Thiopurine S-methyltransferase deficiency</div>
+            <div class="row caveat"><strong>Boundary:</strong> This panel captures TPMT *3C only; other TPMT and NUDT15 variants can still be clinically important.</div>
+            
+            
+            <div class="row"><strong>ClinVar:</strong> drug response — Thiopurine S-methyltransferase deficiency</div>
+            <div class="row"><strong>ClinVar review:</strong> reviewed by expert panel (PharmGKB) · ClinVar 2026-03 snapshot</div>
             
             
             
-            <div class="annot-row"><strong>Azathioprine:</strong> Consider alternative non-thiopurine therapy; if used, reduce dose 10-fold and monitor for severe myelosuppression.</div>
+            <div class="row"><strong>Azathioprine:</strong> Consider alternative non-thiopurine therapy; if used, reduce dose 10-fold and monitor for severe myelosuppression.</div>
+            <div class="row"><strong>PGx evidence:</strong> 1A · CPIC 2018</div>
             
-            <div class="annot-row"><strong>Mercaptopurine:</strong> Start at 30-80% of normal dose (heterozygote) or 10% of normal dose (homozygote).</div>
+            <div class="row"><strong>Mercaptopurine:</strong> Start at 30-80% of normal dose (heterozygote) or 10% of normal dose (homozygote).</div>
+            <div class="row"><strong>PGx evidence:</strong> 1A · CPIC 2018</div>
             
-            <div class="annot-row"><strong>Thioguanine:</strong> Start at 50-80% of normal dose (heterozygote) or consider alternative (homozygote).</div>
+            <div class="row"><strong>Thioguanine:</strong> Start at 50-80% of normal dose (heterozygote) or consider alternative (homozygote).</div>
+            <div class="row"><strong>PGx evidence:</strong> 1A · CPIC 2018</div>
             
             
           </div>
-          
-        </div>
-        
-        <div class="card warning">
-          <div class="card-header">
-            <div class="label">CYP3A5</div>
-            <span class="badge">warning</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs776746</div>
-          <div class="desc">Expresser — higher tacrolimus doses needed.</div>
-          
         </div>
         
       </div>
     </section>
     
   
+    
     
     
     <section class="section">
       <h2>Stimulant &amp; Adenosine Sensitivity</h2>
+      
+      <p class="section-intro">
+        1/4 assessed ·
+        3 not on chip ·
+        0 no-call ·
+        0 ambiguous
+      </p>
+      
       <div class="grid">
         
-        <div class="card normal">
-          <div class="card-header">
-            <div class="label">ADORA2A</div>
-            <span class="badge">normal</span>
-          </div>
-          <div class="value"><span class="gene">CC</span> · rs5751876</div>
-          <div class="desc">Standard response.</div>
-          
-        </div>
-        
         <div class="card warning">
-          <div class="card-header">
+          <div class="badge-row">
             <div class="label">COMT</div>
             <span class="badge">warning</span>
           </div>
-          <div class="value"><span class="gene">GG</span> · rs4680</div>
+          <div class="value">
+            GG · rs4680
+            
+          </div>
           <div class="desc">Warrior — dopamine clears fast; stimulants may feel less intense.</div>
-          
+          <div class="finding-meta">
+            <div class="row"><strong>Confidence:</strong> <span class="confidence">100%</span> · high via exact</div>
+            
+            
+            
+          </div>
         </div>
         
       </div>
     </section>
     
   
+    
+    
+    
+  
 
   <footer>
-    <div style="margin-bottom: 8px;">
-      Generated by <a href="https://github.com/corbett3000/OpenDNA">OpenDNA</a>
-      · ClinVar (NIH, public domain) · PharmGKB under CC BY-SA 4.0
-    </div>
-    <div style="font-size: 0.75rem;">
-      Built by Peter Corbett ·
-      <a href="https://x.com/corbett3000">@corbett3000</a> ·
-      <a href="https://stillrush.co/bio">stillrush.co/bio</a>
-    </div>
+    Generated by <a href="https://github.com/corbett3000/OpenDNA">OpenDNA</a>
+    · ClinVar (NIH, public domain) · PharmGKB / CPIC under CC BY-SA 4.0
   </footer>
 </div>
 </body>

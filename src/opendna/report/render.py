@@ -11,6 +11,8 @@ from opendna.models import AnalysisSummary, Finding, ReportBundle, SourceFileInf
 from opendna.panels import load_panels
 from opendna.summaries import build_analysis_summary, gene_caveats
 
+SCHEMA_VERSION = 1
+
 
 def _group_by_panel(findings: list[Finding]) -> dict[str, list[Finding]]:
     grouped: dict[str, list[Finding]] = defaultdict(list)
@@ -70,6 +72,7 @@ def render_report(
         gene_caveats=gene_caveats(),
     )
     json_payload = {
+        "schema_version": SCHEMA_VERSION,
         "generated_at": generated_at,
         "findings_count": len(findings),
         "counts_by_tier": counts,

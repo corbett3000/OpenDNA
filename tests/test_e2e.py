@@ -48,3 +48,35 @@ def test_full_pipeline_with_mocked_llm(fixtures_dir: Path) -> None:
         })
     assert resp.status_code == 200
     assert "End-to-end prose from mock." in resp.json()["report_html"]
+
+
+def test_report_chat_endpoint_with_mocked_llm() -> None:
+    client = TestClient(app)
+    with patch("opendna.server.get_provider") as mock_get:
+        mock_get.return_value.answer_question.return_value = (
+            "COMT rs4680 is present in this report."
+        )
+        resp = client.post("/api/report-chat", json={
+            "question": "Anything about COMT?",
+            "findings": [
+                {
+                    "panel_id": "methylation",
+                    "rsid": "rs4680",
+                    "gene": "COMT",
+                    "genotype": "AG",
+                    "tier": "warning",
+                    "note": "Intermediate COMT activity",
+                    "description": "Catechol-O-methyltransferase",
+                }
+            ],
+            "analysis_summary": None,
+            "source_file": None,
+            "history": [{"role": "user", "content": "Start with the basics."}],
+            "llm": {"provider": "anthropic", "model": "claude-sonnet-4-6", "api_key": "sk-fake"},
+        })
+
+    assert resp.status_code == 200
+    assert resp.json()["answer"] == "COMT rs4680 is present in this report."
+    call_kwargs = mock_get.return_value.answer_question.call_args.kwargs
+    assert call_kwargs["question"] == "Anything about COMT?"
+    assert call_kwargs["history"][0].content == "Start with the basics."

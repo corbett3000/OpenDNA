@@ -4,7 +4,7 @@ import pytest
 
 from opendna.llm import get_provider
 from opendna.llm.anthropic import AnthropicProvider
-from opendna.models import Finding
+from opendna.models import ChatTurn, Finding
 
 
 def _finding() -> Finding:
@@ -47,3 +47,23 @@ def test_anthropic_provider_redacts_api_key_in_repr() -> None:
     p = AnthropicProvider(api_key="sk-ant-very-secret", model="claude-sonnet-4-6")
     assert "very-secret" not in repr(p)
     assert "sk-ant-" not in repr(p)
+
+
+def test_anthropic_provider_can_answer_report_question() -> None:
+    mock_client = MagicMock()
+    mock_message = MagicMock()
+    mock_message.content = [MagicMock(text="This suggests moderately reduced MTHFR activity.")]
+    mock_client.messages.create.return_value = mock_message
+
+    with patch("opendna.llm.anthropic.anthropic.Anthropic", return_value=mock_client):
+        provider = AnthropicProvider(api_key="sk-fake", model="claude-sonnet-4-6")
+        out = provider.answer_question(
+            [_finding()],
+            question="What does this say about MTHFR?",
+            history=[ChatTurn(role="user", content="Summarize this report briefly.")],
+        )
+
+    assert "MTHFR" in out
+    call_kwargs = mock_client.messages.create.call_args.kwargs
+    assert call_kwargs["messages"][-1]["content"] == "What does this say about MTHFR?"
+    assert "MTHFR" in call_kwargs["messages"][0]["content"]
