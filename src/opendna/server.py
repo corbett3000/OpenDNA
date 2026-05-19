@@ -33,8 +33,8 @@ app = FastAPI(title="OpenDNA", version="0.1.0")
 
 class LLMConfig(BaseModel):
     provider: str
-    model: str
-    api_key: str
+    model: str = ""
+    api_key: str = ""
 
 
 class AnalyzeRequest(BaseModel):

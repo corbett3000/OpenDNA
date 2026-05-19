@@ -11,6 +11,8 @@ def test_get_root_serves_spa() -> None:
     resp = client.get("/")
     assert resp.status_code == 200
     assert "OpenDNA" in resp.text
+    assert "Ollama (local)" in resp.text
+    assert 'const DEFAULT_PROVIDER = "ollama"' in (_static_app_js())
 
 
 def test_list_panels_endpoint() -> None:
@@ -21,6 +23,12 @@ def test_list_panels_endpoint() -> None:
     assert "panels" in body
     ids = {p["id"] for p in body["panels"]}
     assert "methylation" in ids
+
+
+def _static_app_js() -> str:
+    from importlib.resources import files
+
+    return files("opendna.web").joinpath("static/app.js").read_text()
 
 
 def test_analyze_endpoint_returns_findings_without_llm(tmp_path: Path) -> None:
@@ -68,6 +76,24 @@ def test_analyze_endpoint_invokes_llm_when_configured(tmp_path: Path) -> None:
     assert resp.status_code == 200
     assert "AI synthesis goes here." in resp.json()["report_html"]
     mock_get.assert_called_once_with("anthropic", api_key="sk-fake", model="claude-sonnet-4-6")
+
+
+def test_analyze_endpoint_accepts_ollama_without_api_key(tmp_path: Path) -> None:
+    dna = tmp_path / "dna.txt"
+    dna.write_text("rs1801133\t1\t1000\tCT\n")
+    client = TestClient(app)
+
+    with patch("opendna.server.get_provider") as mock_get:
+        mock_get.return_value.interpret.return_value = "Local Ollama synthesis."
+        resp = client.post("/api/analyze", json={
+            "file_path": str(dna),
+            "selected_panels": ["methylation"],
+            "llm": {"provider": "ollama", "model": "llama3.2"},
+        })
+
+    assert resp.status_code == 200
+    assert "Local Ollama synthesis." in resp.json()["report_html"]
+    mock_get.assert_called_once_with("ollama", api_key="", model="llama3.2")
 
 
 def test_update_db_endpoint_returns_status() -> None:

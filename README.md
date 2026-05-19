@@ -6,9 +6,9 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 
-**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, alcohol handling, histamine DAO/HNMT, caffeine tolerance, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional BYOK LLM synthesis (Anthropic Claude or OpenAI GPT) adds a prose interpretation layer and report Q&A.
+**OpenDNA** parses a 23andMe / AncestryDNA / MyHeritage raw DNA file against 12 curated SNP panels (cardiovascular, methylation, pharmacogenomics, athletic, dietary, HFE, histamine, cognition, stimulant sensitivity, eye health, vitamin D, nicotine), joins findings with ClinVar + PharmGKB/CPIC annotations, and renders a self-contained HTML report. It now also scores match confidence, shows panel coverage / blind spots, and rolls multi-marker patterns like APOE, HFE, MTHFR, alcohol handling, histamine DAO/HNMT, caffeine tolerance, CYP2C19, warfarin PGx, statin PGx, DPYD, AMD susceptibility, vitamin D tendency, and nicotine dependence into composite calls. Optional LLM synthesis can run locally through Ollama or remotely through BYOK Anthropic / OpenAI, adding a prose interpretation layer and report Q&A.
 
-**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If — and only if — you paste an API key and opt in to AI synthesis or report chat, OpenDNA sends filtered report context to the provider you chose: the called findings (panel id + rsid + gene + genotype + tier + short note, plus compact ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and any question you ask. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
+**What leaves your machine:** nothing, by default. No account, no upload, no telemetry. The raw DNA file is parsed, analyzed, and rendered entirely offline. If you choose **Ollama (local)**, OpenDNA sends filtered report context only to your local Ollama server at `http://127.0.0.1:11434`. If — and only if — you choose Anthropic or OpenAI and provide an API key, OpenDNA sends that same filtered report context to the remote provider you chose: the called findings (panel id + rsid + gene + genotype + tier + short note, plus compact ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and any question you ask. Your raw DNA file is never transmitted. See the [Privacy](#privacy--what-leaves-your-machine) section for the full rules.
 
 ## Sample report
 
@@ -32,7 +32,7 @@ OpenDNA is an educational and exploratory tool. **It is not a clinical diagnosti
 This is the whole trust claim; read it carefully:
 
 1. **Your raw DNA file never leaves your machine.** Parsing, panel matching, ClinVar + PharmGKB annotation, and the rule-based report all happen on `localhost`. No step in that pipeline touches the network.
-2. **LLM synthesis and report chat are opt-in and send a minimal payload.** If and only if you paste an API key and click Generate or ask a report question, OpenDNA sends filtered report context to the provider you chose: called findings (panel id, rsid, gene, genotype, tier, note, and relevant ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and your question when using report chat. Your raw DNA file is **never** sent.
+2. **LLM synthesis and report chat are opt-in and send a minimal payload.** With Ollama, filtered report context is sent to your local Ollama server at `http://127.0.0.1:11434` and no API key is needed. With Anthropic or OpenAI, OpenDNA sends filtered report context to the remote provider only after you select that provider and provide an API key. The payload is called findings (panel id, rsid, gene, genotype, tier, note, and relevant ClinVar / PharmGKB summaries when present), derived report summaries, source-file coverage context, and your question when using report chat. Your raw DNA file is **never** sent.
 3. **No telemetry, no accounts, no server-side persistence.** API keys are read from the request, held in memory for one call, then discarded. There is no database.
 4. **The server binds to `127.0.0.1` by default.** Only the machine running it can reach it. `--host 0.0.0.0` requires an explicit flag and prints a warning.
 5. **Browser-local convenience storage is opt-in and bounded.** The web UI can remember your DNA file path, LLM provider, model, and API key in the browser's `localStorage` (scoped to the exact app origin, such as `http://127.0.0.1:8787`, in that one browser profile). Nothing is written to disk by the server, committed to git, or transmitted anywhere. The **Remember** checkbox controls it; the **Clear saved values** button wipes it instantly.
@@ -47,7 +47,8 @@ This is the whole trust claim; read it carefully:
   - Ubuntu/Debian: `sudo apt install python3.13 python3.13-venv`
   - Windows: [python.org downloads](https://www.python.org/downloads/)
 - **Your raw DNA file** from a consumer testing service (see instructions below).
-- *(Optional)* An API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/api-keys) if you want AI-generated prose interpretation.
+- *(Optional)* [Ollama](https://ollama.com/) if you want local AI-generated prose and report chat without a remote API key.
+- *(Optional)* An API key from [Anthropic](https://console.anthropic.com/) or [OpenAI](https://platform.openai.com/api-keys) if you want remote AI-generated prose interpretation.
 
 ### Getting your raw DNA file
 
@@ -77,7 +78,7 @@ source .venv/bin/activate           # macOS / Linux
 # .venv\Scripts\activate            # Windows PowerShell
 
 # 3. Install OpenDNA with all optional LLM providers and dev tools
-pip install -e ".[all]"             # core + anthropic + openai SDKs
+pip install -e ".[all]"             # core + anthropic + openai SDKs; Ollama works with core deps
 # -- or --
 pip install -e ".[dev,all]"         # adds pytest, ruff, mypy (for contributors)
 
@@ -86,7 +87,7 @@ opendna --version
 pytest -v                           # (only if you installed [dev])
 ```
 
-Current contributor baseline: `54` tests passing.
+Current contributor baseline: `61` tests passing.
 
 ---
 
@@ -99,7 +100,7 @@ opendna serve
 
 1. **Paste the absolute path** to your raw DNA file (e.g. `/Users/you/Downloads/genome_yourname.txt`).
 2. **Pick panels** — all 12 are selected by default; uncheck to narrow the scope.
-3. **(Optional) AI synthesis** — pick Anthropic or OpenAI, pick a model, paste your API key. Leave the provider as *None* for a rule-based report only.
+3. **(Optional) AI synthesis** — pick Ollama for local inference with no API key, or pick Anthropic / OpenAI and paste your API key. Leave the provider as *None* for a rule-based report only.
 4. **Click *Generate report*.** Watch the progress bar — you'll see the pipeline advance through validate → parse → analyze → annotate → LLM → render.
 5. **Ask follow-up questions** in the report-chat box if you want to query a specific gene, pathway, or blind spot.
 6. **Download** the self-contained HTML or the structured JSON.
@@ -108,8 +109,15 @@ opendna serve
 
 - **Anthropic:** `claude-sonnet-4-6` (Claude Sonnet 4.6 — fast, good reasoning, prompt caching enabled).
 - **OpenAI:** `gpt-4o`.
+- **Ollama:** `llama3.2` at `http://127.0.0.1:11434` (local, no API key).
 
-Override either by typing a different model name into the Model field.
+Override any provider by typing a different model name into the Model field.
+
+For Ollama, install the app and pull the model first:
+
+```bash
+ollama pull llama3.2
+```
 
 ### Remembering your settings
 
@@ -187,6 +195,7 @@ The analyzer automatically handles both **allele-order variations** (`AG` == `GA
 | `port already in use` | Run on a different port: `opendna serve --port 9000`. |
 | `File not found` in the UI | Use the absolute path (starts with `/` on macOS/Linux, `C:\` on Windows). Drag-and-dropping a file into Terminal also produces an absolute path you can paste. |
 | The app hangs on "Calling anthropic…" | The LLM call can legitimately take 10–30 seconds. Give it time. Check that the API key is valid and the model name is spelled correctly. |
+| Ollama says it is unreachable | Start Ollama and confirm `http://127.0.0.1:11434` is running. Pull the selected model first, e.g. `ollama pull llama3.2`. |
 | OpenAI: `max_tokens not supported` | Upgrade to latest OpenDNA — we use `max_completion_tokens` now. |
 | `ModuleNotFoundError: anthropic` | Install the extra: `pip install -e ".[all]"`. |
 | Zip file instead of `.txt` | Unzip first (`unzip genome.zip`), point at the `.txt` inside. |

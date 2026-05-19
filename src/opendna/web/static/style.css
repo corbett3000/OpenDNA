@@ -26,6 +26,7 @@ textarea { resize: vertical; min-height: 148px; line-height: 1.45; }
 .storage-note .remember { display: flex; align-items: center; gap: 8px; margin: 0; flex: 1; min-width: 280px; color: var(--dim); font-size: 0.85rem; }
 .storage-note .remember input[type="checkbox"] { width: auto; margin: 0; }
 .storage-note code { background: rgba(255,255,255,0.05); padding: 1px 5px; border-radius: 4px; font-size: 0.78rem; color: var(--accent); }
+.llm-note { color: var(--dim); font-size: 0.85rem; line-height: 1.45; margin: 8px 0 0; }
 .status { margin-top: 16px; color: var(--dim); font-size: 0.9rem; }
 .status.error { color: var(--danger); }
 .progress { margin-top: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }

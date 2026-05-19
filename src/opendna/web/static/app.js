@@ -10,10 +10,20 @@ const CHAT_HISTORY_LIMIT = 6;
 // sufficient to remove them.
 const STORAGE_KEY = "opendna:preferences";
 
+const DEFAULT_MODELS = {
+  anthropic: "claude-sonnet-4-6",
+  openai: "gpt-4o",
+  ollama: "llama3.2",
+};
+const DEFAULT_PROVIDER = "ollama";
+
 function loadStoredPrefs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+    if (!raw) {
+      applyDefaultPrefs();
+      return;
+    }
     const prefs = JSON.parse(raw);
     if (prefs.filePath) $("file-path").value = prefs.filePath;
     if (prefs.llmProvider) $("llm-provider").value = prefs.llmProvider;
@@ -21,8 +31,15 @@ function loadStoredPrefs() {
     if (prefs.apiKey) $("llm-key").value = prefs.apiKey;
     if (typeof prefs.remember === "boolean") $("remember").checked = prefs.remember;
   } catch {
-    // storage disabled or corrupt — fall through to blank form
+    // Storage disabled or corrupt: use the privacy-preserving local default.
+    applyDefaultPrefs();
   }
+}
+
+function applyDefaultPrefs() {
+  $("llm-provider").value = DEFAULT_PROVIDER;
+  $("llm-model").value = DEFAULT_MODELS[DEFAULT_PROVIDER];
+  $("llm-key").value = "";
 }
 
 function saveStoredPrefs() {
@@ -44,10 +61,10 @@ function saveStoredPrefs() {
 function clearStoredPrefs() {
   try { localStorage.removeItem(STORAGE_KEY); } catch {}
   $("file-path").value = "";
-  $("llm-provider").value = "";
-  $("llm-model").value = "";
-  $("llm-key").value = "";
+  applyDefaultPrefs();
   $("remember").checked = true;
+  syncProviderFields();
+  syncChatAvailability();
   setStatus("Cleared saved values.", false);
 }
 
@@ -89,8 +106,8 @@ function llmConfig() {
   if (!provider) return null;
   return {
     provider,
-    model: $("llm-model").value || (provider === "anthropic" ? "claude-sonnet-4-6" : "gpt-4o"),
-    api_key: $("llm-key").value,
+    model: $("llm-model").value || DEFAULT_MODELS[provider] || "",
+    api_key: provider === "ollama" ? "" : $("llm-key").value,
   };
 }
 
@@ -113,6 +130,30 @@ function setChatStatus(message, isError) {
   const status = $("chat-status");
   status.className = isError ? "status chat-status error" : "status chat-status";
   status.textContent = message;
+}
+
+function syncProviderFields() {
+  const provider = $("llm-provider").value;
+  const model = $("llm-model");
+  const key = $("llm-key");
+  const note = $("llm-note");
+
+  model.placeholder = DEFAULT_MODELS[provider] || "claude-sonnet-4-6";
+
+  if (provider === "ollama") {
+    key.value = "";
+    key.disabled = true;
+    key.placeholder = "No API key needed";
+    note.textContent = "Ollama uses your local server at http://127.0.0.1:11434.";
+  } else if (provider === "anthropic" || provider === "openai") {
+    key.disabled = false;
+    key.placeholder = "sk-...";
+    note.textContent = "Remote providers receive filtered report context only after you opt in.";
+  } else {
+    key.disabled = false;
+    key.placeholder = "sk-...";
+    note.textContent = "";
+  }
 }
 
 // --- Report chat ---------------------------------------------------
@@ -167,7 +208,6 @@ function resetChat(show = false) {
 function syncChatAvailability() {
   const llm = llmConfig();
   const send = $("chat-send");
-  const key = $("llm-key").value.trim();
 
   if (!lastReport) {
     send.disabled = true;
@@ -176,17 +216,21 @@ function syncChatAvailability() {
   }
   if (!llm) {
     send.disabled = true;
-    setChatStatus("Choose Anthropic or OpenAI above to enable report chat.", true);
+    setChatStatus("Choose Ollama, Anthropic, or OpenAI above to enable report chat.", true);
     return;
   }
-  if (!key) {
+  if (llm.provider !== "ollama" && !llm.api_key.trim()) {
     send.disabled = true;
     setChatStatus("Paste an API key above to enable report chat.", true);
     return;
   }
 
   send.disabled = false;
-  setChatStatus("Report chat is ready.", false);
+  if (llm.provider === "ollama") {
+    setChatStatus("Report chat is ready via local Ollama.", false);
+  } else {
+    setChatStatus("Report chat is ready.", false);
+  }
 }
 
 async function askReportChat() {
@@ -205,11 +249,11 @@ async function askReportChat() {
 
   const llm = llmConfig();
   if (!llm) {
-    setStatus("Choose Anthropic or OpenAI to use report chat.", true);
-    setChatStatus("Choose Anthropic or OpenAI above to use report chat.", true);
+    setStatus("Choose Ollama, Anthropic, or OpenAI to use report chat.", true);
+    setChatStatus("Choose Ollama, Anthropic, or OpenAI above to use report chat.", true);
     return;
   }
-  if (!llm.api_key.trim()) {
+  if (llm.provider !== "ollama" && !llm.api_key.trim()) {
     setStatus("Paste an API key to use report chat.", true);
     setChatStatus("Paste an API key above to use report chat.", true);
     return;
@@ -415,7 +459,10 @@ $("chat-question").addEventListener("keydown", (event) => {
     askReportChat();
   }
 });
-$("llm-provider").addEventListener("change", syncChatAvailability);
+$("llm-provider").addEventListener("change", () => {
+  syncProviderFields();
+  syncChatAvailability();
+});
 $("llm-model").addEventListener("input", syncChatAvailability);
 $("llm-key").addEventListener("input", syncChatAvailability);
 $("remember").addEventListener("change", () => {
@@ -425,5 +472,6 @@ $("remember").addEventListener("change", () => {
 });
 
 loadStoredPrefs();
+syncProviderFields();
 loadPanels();
 syncChatAvailability();

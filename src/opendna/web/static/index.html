@@ -30,14 +30,16 @@
       <label>Provider:
         <select id="llm-provider">
           <option value="">None (rule-based only)</option>
+          <option value="ollama">Ollama (local)</option>
           <option value="anthropic">Anthropic (Claude)</option>
           <option value="openai">OpenAI (GPT)</option>
         </select>
       </label>
-      <label>Model: <input id="llm-model" type="text" placeholder="claude-sonnet-4-6"></label>
+      <label>Model: <input id="llm-model" type="text" placeholder="llama3.2"></label>
       <label>API key:
         <input id="llm-key" type="password" placeholder="sk-...">
       </label>
+      <p id="llm-note" class="llm-note"></p>
     </section>
 
     <section class="card storage-note">
@@ -70,8 +72,8 @@
         <div>
           <h2>4. Ask about this report</h2>
           <p class="chat-note">
-            Uses your current provider, model, and API key. Sends only filtered report findings,
-            coverage context, and your question.
+            Uses your current provider and model. Ollama runs locally with no API key.
+            Remote providers receive only filtered report findings, coverage context, and your question.
           </p>
         </div>
       </div>
