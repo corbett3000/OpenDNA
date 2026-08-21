@@ -1,3 +1,5 @@
+
+
 # OpenDNA
 
 > Local-first precision-medicine synthesis for consumer DNA files. Your raw DNA file stays on your machine.
@@ -80,7 +82,7 @@ source .venv/bin/activate           # macOS / Linux
 # 3. Install OpenDNA with all optional LLM providers and dev tools
 pip install -e ".[all]"             # core + anthropic + openai SDKs; Ollama works with core deps
 # -- or --
-pip install -e ".[dev,all]"         # adds pytest, ruff, mypy (for contributors)
+pip install -e ".[dev,all]"         # adds pytest, pytest-asyncio, ruff, mypy (for contributors)
 
 # 4. Sanity-check
 opendna --version
