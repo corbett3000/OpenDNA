@@ -1,9 +1,15 @@
-"""23andMe-style raw DNA file parser."""
+"""Consumer-DNA raw file parser (23andMe TSV, MyHeritage CSV, AncestryDNA, FTDNA)."""
 from __future__ import annotations
 
+import csv
+import io
 from pathlib import Path
 
 from opendna.models import ParseIssue, ParseResult, SourceFileInfo
+
+# Column names used by CSV-format providers (case-insensitive).
+_CSV_HEADER_RSID_NAMES = {"rsid", "# rsid"}
+_CSV_HEADER_RESULT_NAMES = {"result", "genotype", "allele1"}
 
 _VENDOR_PATTERNS = {
     "23andMe": ("23andme", "23and me", "fileformat=23andme"),
@@ -55,9 +61,9 @@ def _detect_vendor(comment_lines: list[str], file_name: str) -> str | None:
 
 def _detect_build(comment_lines: list[str]) -> str | None:
     haystack = "\n".join(comment_lines).lower()
-    if "grch38" in haystack or "build 38" in haystack:
+    if "grch38" in haystack or "build 38" in haystack or "build38" in haystack:
         return "GRCh38"
-    if "grch37" in haystack or "build 37" in haystack:
+    if "grch37" in haystack or "build 37" in haystack or "build37" in haystack:
         return "GRCh37"
     return None
 
@@ -155,8 +161,41 @@ def _build_issues(
     return issues
 
 
+def _detect_delimiter(data_lines: list[str]) -> str:
+    """Detect whether data rows are comma- or tab-separated.
+
+    Looks at the first non-empty data line and counts delimiters.
+    Defaults to tab if no clear winner.
+    """
+    for line in data_lines:
+        if line.strip():
+            n_commas = line.count(",")
+            n_tabs = line.count("\t")
+            if n_commas > n_tabs:
+                return ","
+            break
+    return "\t"
+
+
+def _strip_quotes(value: str) -> str:
+    """Remove surrounding double-quotes from a CSV field value."""
+    value = value.strip()
+    if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+        return value[1:-1]
+    return value
+
+
 def parse_source_file(path: Path | str) -> ParseResult:
-    """Parse a consumer-DNA TSV into genotypes plus file-level metadata."""
+    """Parse a consumer-DNA file (TSV or CSV) into genotypes plus file-level metadata.
+
+    Supports:
+    - Tab-separated format (23andMe, early AncestryDNA, FTDNA)
+    - Comma-separated format with optional quoting (MyHeritage, newer AncestryDNA)
+
+    Comment lines (starting with ``#``) and blank lines are always skipped.
+    The header row is detected heuristically and skipped without counting as
+    malformed.
+    """
     path = Path(path)
     results: dict[str, str] = {}
     comment_lines: list[str] = []
@@ -167,37 +206,58 @@ def parse_source_file(path: Path | str) -> ParseResult:
     no_call_count = 0
     ambiguous_call_count = 0
 
-    with path.open(encoding="utf-8-sig") as f:
-        for raw_line in f:
-            line = raw_line.strip()
-            if not line:
-                continue
-            if line.startswith("#"):
-                comment_lines.append(line)
-                continue
+    raw_text = path.read_text(encoding="utf-8-sig")
+    all_lines = raw_text.splitlines()
 
-            parts = line.split("\t")
-            if len(parts) < 4:
-                malformed_row_count += 1
-                continue
+    # Separate comment / blank lines from data lines so we can detect the delimiter.
+    data_lines: list[str] = []
+    for raw_line in all_lines:
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("#"):
+            comment_lines.append(line)
+        else:
+            data_lines.append(raw_line)  # keep original (may have leading whitespace)
 
-            rsid, chrom, _pos, genotype = parts[:4]
-            if not rsid.startswith("rs"):
-                malformed_row_count += 1
-                continue
+    delimiter = _detect_delimiter(data_lines)
 
-            parsed_row_count += 1
-            chromosomes.add(chrom)
-            genotype = genotype.strip().upper()
-            if rsid in results:
-                duplicate_rsid_count += 1
-            results[rsid] = genotype
+    if delimiter == ",":
+        # Use csv.reader to handle optional quoting correctly.
+        reader = csv.reader(io.StringIO("\n".join(data_lines)), delimiter=",")
+        rows: list[list[str]] = list(reader)
+    else:
+        rows = [line.split("\t") for line in data_lines]
 
-            status = _classify_genotype(genotype)
-            if status == "no_call":
-                no_call_count += 1
-            elif status == "ambiguous":
-                ambiguous_call_count += 1
+    for parts in rows:
+        if len(parts) < 4:
+            malformed_row_count += 1
+            continue
+
+        rsid = parts[0].strip().strip('"')
+        chrom = parts[1].strip().strip('"')
+        genotype = parts[3].strip().strip('"').upper()
+
+        # Skip header rows gracefully (e.g. "RSID", "rsid", "#rsid").
+        rsid_lower = rsid.lower().lstrip("#").strip()
+        if rsid_lower in _CSV_HEADER_RSID_NAMES or rsid_lower == "rsid":
+            continue
+
+        if not rsid.startswith("rs"):
+            malformed_row_count += 1
+            continue
+
+        parsed_row_count += 1
+        chromosomes.add(chrom)
+        if rsid in results:
+            duplicate_rsid_count += 1
+        results[rsid] = genotype
+
+        status = _classify_genotype(genotype)
+        if status == "no_call":
+            no_call_count += 1
+        elif status == "ambiguous":
+            ambiguous_call_count += 1
 
     vendor = _detect_vendor(comment_lines, path.name)
     build = _detect_build(comment_lines)
@@ -229,6 +289,7 @@ def parse_source_file(path: Path | str) -> ParseResult:
             issues=issues,
         ),
     )
+
 
 
 def parse_23andme(path: Path | str) -> dict[str, str]:
